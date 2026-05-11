@@ -1,9 +1,8 @@
 import SwiftUI
 
 struct WatchContentView: View {
-    @StateObject private var viewModel = WatchWorkoutViewModel()
+    @State private var viewModel = WatchWorkoutViewModel()
     @State private var isShowingSettings = false
-    private let ticker = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
@@ -17,7 +16,7 @@ struct WatchContentView: View {
                             get: { viewModel.state.soundsEnabled },
                             set: { viewModel.setSoundsEnabled($0) }
                         ),
-                        showsReset: showsReset,
+                        showsReset: presentation.showsReset,
                         reset: {
                             viewModel.reset()
                             withAnimation(.smooth(duration: 0.22)) {
@@ -54,7 +53,7 @@ struct WatchContentView: View {
                             .accessibilityLabel("Settings")
                         }
 
-                        Text(stateTitle)
+                        Text(presentation.title)
                             .font(.system(size: 27, weight: .black, design: .rounded))
                             .foregroundStyle(.white)
 
@@ -65,14 +64,14 @@ struct WatchContentView: View {
                             .minimumScaleFactor(0.5)
                             .lineLimit(1)
 
-                        Text(roundText)
+                        Text(presentation.watchRoundText)
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.85))
 
                         HStack(spacing: 6) {
                             primaryActionButton
 
-                            if showsReset {
+                            if presentation.showsReset {
                                 Button {
                                     viewModel.reset()
                                 } label: {
@@ -97,8 +96,8 @@ struct WatchContentView: View {
         .onAppear {
             viewModel.activate()
         }
-        .onReceive(ticker) { now in
-            viewModel.tick(now: now)
+        .task(id: viewModel.state.isRunning) {
+            await tickWhileRunning()
         }
     }
 
@@ -108,7 +107,7 @@ struct WatchContentView: View {
             Button {
                 primaryAction()
             } label: {
-                Text(viewModel.primaryButtonTitle)
+                Text(presentation.primaryButtonTitle)
                     .frame(maxWidth: .infinity, minHeight: 32)
             }
             .buttonStyle(.glassProminent)
@@ -116,7 +115,7 @@ struct WatchContentView: View {
             Button {
                 primaryAction()
             } label: {
-                Text(viewModel.primaryButtonTitle)
+                Text(presentation.primaryButtonTitle)
                     .frame(maxWidth: .infinity, minHeight: 32)
             }
             .buttonStyle(.glass)
@@ -125,7 +124,7 @@ struct WatchContentView: View {
     }
 
     private func primaryAction() {
-        if viewModel.state.phase == .complete {
+        if presentation.primaryAction == .reset {
             viewModel.reset()
         } else {
             viewModel.toggleRunning()
@@ -133,79 +132,31 @@ struct WatchContentView: View {
     }
 
     private var isPrimaryButtonProminent: Bool {
-        viewModel.state.phase == .idle || viewModel.state.phase == .complete || isPaused
+        presentation.isPrimaryButtonProminent
     }
 
-    private var showsReset: Bool {
-        isPaused
-    }
-
-    private var isPaused: Bool {
-        viewModel.state.isWorkoutPhase && !viewModel.state.isRunning
-    }
-
-    private var stateTitle: String {
-        if viewModel.state.isWorkoutPhase, !viewModel.state.isRunning {
-            return "PAUSED"
-        }
-
-        switch viewModel.state.phase {
-        case .idle:
-            return "Tabata"
-        case .work:
-            return "WORK"
-        case .rest:
-            return "REST"
-        case .complete:
-            return "DONE"
-        }
+    private var presentation: TabataPresentation {
+        TabataPresentation(state: viewModel.state)
     }
 
     private var timeText: String {
-        let remaining = Int(ceil(viewModel.state.remaining(at: Date())))
+        let remaining = Int(ceil(viewModel.state.remaining(at: viewModel.now)))
         return String(format: "0:%02d", max(0, remaining))
     }
 
-    private var roundText: String {
-        switch viewModel.state.phase {
-        case .idle:
-            return "8 rounds"
-        case .complete:
-            return "Complete"
-        case .work, .rest:
-            return "\(viewModel.state.round) / \(viewModel.state.config.rounds)"
-        }
+    private var backgroundColors: [Color] {
+        [Color(presentation.background.start), Color(presentation.background.end)]
     }
 
-    private var backgroundColors: [Color] {
-        if viewModel.state.isWorkoutPhase, !viewModel.state.isRunning {
-            return [
-                Color(red: 0.24, green: 0.24, blue: 0.27),
-                Color(red: 0.10, green: 0.11, blue: 0.13)
-            ]
+    @MainActor
+    private func tickWhileRunning() async {
+        guard viewModel.state.isRunning else {
+            return
         }
 
-        switch viewModel.state.phase {
-        case .idle:
-            return [
-                Color(red: 0.03, green: 0.52, blue: 0.50),
-                Color(red: 0.18, green: 0.24, blue: 0.72)
-            ]
-        case .work:
-            return [
-                Color(red: 0.92, green: 0.48, blue: 0.12),
-                Color(red: 0.70, green: 0.30, blue: 0.06)
-            ]
-        case .rest:
-            return [
-                Color(red: 0.00, green: 0.48, blue: 0.95),
-                Color(red: 0.04, green: 0.24, blue: 0.78)
-            ]
-        case .complete:
-            return [
-                Color(red: 0.08, green: 0.64, blue: 0.40),
-                Color(red: 0.04, green: 0.38, blue: 0.29)
-            ]
+        while !Task.isCancelled, viewModel.state.isRunning {
+            viewModel.tick(now: Date())
+            try? await Task.sleep(nanoseconds: 200_000_000)
         }
     }
 }
@@ -263,5 +214,11 @@ private struct WatchSettingsView: View {
                 .foregroundStyle(.white)
             }
         }
+    }
+}
+
+private extension Color {
+    init(_ tabataColor: TabataColor) {
+        self.init(red: tabataColor.red, green: tabataColor.green, blue: tabataColor.blue)
     }
 }

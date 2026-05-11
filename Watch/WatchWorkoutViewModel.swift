@@ -1,19 +1,24 @@
 import AVFoundation
-import Combine
+import Observation
 import SwiftUI
 import WatchKit
 
 @MainActor
-final class WatchWorkoutViewModel: ObservableObject {
-    @Published private(set) var state: TabataState
+@Observable
+final class WatchWorkoutViewModel {
+    private(set) var state: TabataState
+    private(set) var now: Date
 
     private static let soundsEnabledKey = "soundsEnabled"
 
+    @ObservationIgnored
     private var engine: TabataEngine
     private let defaults: UserDefaults
     private let connectivity = WatchConnectivity()
     private let cuePerformer = WatchCuePerformer()
+    @ObservationIgnored
     private var lastCountdownCue: CountdownCue?
+    @ObservationIgnored
     private var didActivate = false
 
     init(defaults: UserDefaults = .standard) {
@@ -25,19 +30,8 @@ final class WatchWorkoutViewModel: ObservableObject {
         }
 
         state = initialState
+        now = Date()
         engine = TabataEngine(state: initialState)
-    }
-
-    var primaryButtonTitle: String {
-        if state.phase == .complete {
-            return "Back Home"
-        }
-
-        if state.phase == .idle {
-            return "Start"
-        }
-
-        return state.isRunning ? "Pause" : "Resume"
     }
 
     func activate() {
@@ -54,6 +48,7 @@ final class WatchWorkoutViewModel: ObservableObject {
 
     func tick(now: Date = Date()) {
         let oldState = state
+        self.now = now
         state = engine.tick(now: now)
 
         if TabataCuePolicy.needsTransitionCue(from: oldState, to: state) {
@@ -76,6 +71,7 @@ final class WatchWorkoutViewModel: ObservableObject {
     }
 
     func setSoundsEnabled(_ enabled: Bool) {
+        now = Date()
         defaults.set(enabled, forKey: Self.soundsEnabledKey)
         state.soundsEnabled = enabled
         engine = TabataEngine(state: state)
@@ -84,6 +80,7 @@ final class WatchWorkoutViewModel: ObservableObject {
     }
 
     private func receive(_ newState: TabataState) {
+        now = Date()
         defaults.set(newState.soundsEnabled, forKey: Self.soundsEnabledKey)
         state = newState
         engine = TabataEngine(state: newState)
@@ -92,29 +89,35 @@ final class WatchWorkoutViewModel: ObservableObject {
 }
 
 private final class WatchCuePerformer {
-    private var player: AVAudioPlayer?
+    private let countdownPlayer = WatchCuePerformer.makePlayer(frequency: 880, duration: 0.08)
+    private let transitionPlayer = WatchCuePerformer.makePlayer(frequency: 1320, duration: 0.16)
 
     func playCountdown() {
-        playTone(frequency: 880, duration: 0.08)
+        play(countdownPlayer)
         WKInterfaceDevice.current().play(.click)
     }
 
     func playTransition() {
-        playTone(frequency: 1320, duration: 0.16)
+        play(transitionPlayer)
         WKInterfaceDevice.current().play(.notification)
     }
 
-    private func playTone(frequency: Double, duration: Double) {
+    private static func makePlayer(frequency: Double, duration: Double) -> AVAudioPlayer? {
         guard let data = toneData(frequency: frequency, duration: duration) else {
-            return
+            return nil
         }
 
-        player = try? AVAudioPlayer(data: data)
+        let player = try? AVAudioPlayer(data: data)
         player?.prepareToPlay()
+        return player
+    }
+
+    private func play(_ player: AVAudioPlayer?) {
+        player?.currentTime = 0
         player?.play()
     }
 
-    private func toneData(frequency: Double, duration: Double) -> Data? {
+    private static func toneData(frequency: Double, duration: Double) -> Data? {
         let sampleRate = 22_050
         let sampleCount = Int(duration * Double(sampleRate))
         let byteCount = sampleCount * MemoryLayout<Int16>.size
@@ -144,11 +147,11 @@ private final class WatchCuePerformer {
         return data
     }
 
-    private func append(_ string: String, to data: inout Data) {
+    private static func append(_ string: String, to data: inout Data) {
         data.append(contentsOf: string.utf8)
     }
 
-    private func append<T>(_ value: T, to data: inout Data) {
+    private static func append<T>(_ value: T, to data: inout Data) {
         var value = value
         withUnsafeBytes(of: &value) { bytes in
             data.append(contentsOf: bytes)

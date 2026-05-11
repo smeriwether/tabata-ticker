@@ -55,6 +55,106 @@ struct TabataState: Codable, Equatable, Sendable {
     }
 }
 
+struct TabataColor: Equatable, Sendable {
+    var red: Double
+    var green: Double
+    var blue: Double
+}
+
+struct TabataGradient: Equatable, Sendable {
+    var start: TabataColor
+    var end: TabataColor
+}
+
+enum TabataPrimaryAction: Equatable, Sendable {
+    case toggleRunning
+    case reset
+}
+
+struct TabataPresentation: Equatable, Sendable {
+    var title: String
+    var phoneRoundText: String
+    var watchRoundText: String
+    var background: TabataGradient
+    var primaryButtonTitle: String
+    var primaryAction: TabataPrimaryAction
+    var isPrimaryButtonProminent: Bool
+    var showsReset: Bool
+
+    init(state: TabataState) {
+        let isPaused = state.isWorkoutPhase && !state.isRunning
+
+        showsReset = isPaused
+        isPrimaryButtonProminent = state.phase == .idle || state.phase == .complete || isPaused
+
+        if state.phase == .complete {
+            primaryButtonTitle = "Back Home"
+            primaryAction = .reset
+        } else if state.phase == .idle {
+            primaryButtonTitle = "Start"
+            primaryAction = .toggleRunning
+        } else {
+            primaryButtonTitle = state.isRunning ? "Pause" : "Resume"
+            primaryAction = .toggleRunning
+        }
+
+        switch state.phase {
+        case .idle:
+            phoneRoundText = "8 rounds"
+            watchRoundText = "8 rounds"
+        case .complete:
+            phoneRoundText = "Complete"
+            watchRoundText = "Complete"
+        case .work, .rest:
+            phoneRoundText = "Round \(state.round) of \(state.config.rounds)"
+            watchRoundText = "\(state.round) / \(state.config.rounds)"
+        }
+
+        if isPaused {
+            title = "PAUSED"
+            background = .paused
+        } else {
+            switch state.phase {
+            case .idle:
+                title = "Tabata"
+                background = .idle
+            case .work:
+                title = "WORK"
+                background = .work
+            case .rest:
+                title = "REST"
+                background = .rest
+            case .complete:
+                title = "DONE"
+                background = .complete
+            }
+        }
+    }
+}
+
+private extension TabataGradient {
+    static let idle = TabataGradient(
+        start: TabataColor(red: 0.03, green: 0.52, blue: 0.50),
+        end: TabataColor(red: 0.18, green: 0.24, blue: 0.72)
+    )
+    static let work = TabataGradient(
+        start: TabataColor(red: 0.92, green: 0.48, blue: 0.12),
+        end: TabataColor(red: 0.70, green: 0.30, blue: 0.06)
+    )
+    static let rest = TabataGradient(
+        start: TabataColor(red: 0.00, green: 0.48, blue: 0.95),
+        end: TabataColor(red: 0.04, green: 0.24, blue: 0.78)
+    )
+    static let complete = TabataGradient(
+        start: TabataColor(red: 0.08, green: 0.64, blue: 0.40),
+        end: TabataColor(red: 0.04, green: 0.38, blue: 0.29)
+    )
+    static let paused = TabataGradient(
+        start: TabataColor(red: 0.24, green: 0.24, blue: 0.27),
+        end: TabataColor(red: 0.10, green: 0.11, blue: 0.13)
+    )
+}
+
 struct TabataEngine {
     private(set) var state: TabataState
 

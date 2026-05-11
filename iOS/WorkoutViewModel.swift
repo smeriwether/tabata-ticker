@@ -1,19 +1,24 @@
 import AudioToolbox
-import Combine
+import Observation
 import SwiftUI
 import UIKit
 
 @MainActor
-final class WorkoutViewModel: ObservableObject {
-    @Published private(set) var state: TabataState
+@Observable
+final class WorkoutViewModel {
+    private(set) var state: TabataState
+    private(set) var now: Date
 
     private static let soundsEnabledKey = "soundsEnabled"
 
+    @ObservationIgnored
     private var engine: TabataEngine
     private let defaults: UserDefaults
     private let connectivity = PhoneConnectivity()
     private let cuePerformer = PhoneCuePerformer()
+    @ObservationIgnored
     private var lastCountdownCue: CountdownCue?
+    @ObservationIgnored
     private var didActivate = false
 
     init(defaults: UserDefaults = .standard) {
@@ -25,19 +30,8 @@ final class WorkoutViewModel: ObservableObject {
         }
 
         state = initialState
+        now = Date()
         engine = TabataEngine(state: initialState)
-    }
-
-    var primaryButtonTitle: String {
-        if state.phase == .complete {
-            return "Back Home"
-        }
-
-        if state.phase == .idle {
-            return "Start"
-        }
-
-        return state.isRunning ? "Pause" : "Resume"
     }
 
     func activate() {
@@ -55,6 +49,7 @@ final class WorkoutViewModel: ObservableObject {
 
     func tick(now: Date = Date()) {
         let oldState = state
+        self.now = now
         state = engine.tick(now: now)
         updateIdleTimer()
 
@@ -74,13 +69,16 @@ final class WorkoutViewModel: ObservableObject {
     }
 
     func toggleRunning() {
-        engine.toggleRunning(now: Date())
+        let now = Date()
+        self.now = now
+        engine.toggleRunning(now: now)
         state = engine.state
         updateIdleTimer()
         sendState()
     }
 
     func reset() {
+        now = Date()
         engine.reset()
         state = engine.state
         lastCountdownCue = nil
@@ -89,6 +87,7 @@ final class WorkoutViewModel: ObservableObject {
     }
 
     func setSoundsEnabled(_ enabled: Bool) {
+        now = Date()
         defaults.set(enabled, forKey: Self.soundsEnabledKey)
         engine.setSoundsEnabled(enabled)
         state = engine.state

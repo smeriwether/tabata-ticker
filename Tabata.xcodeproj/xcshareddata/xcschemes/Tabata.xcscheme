@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B9442AFEA136562E8A9B9785"
+               BlueprintIdentifier = "2C5B726C4C981F0671E1ADEC"
                BuildableName = "Tabata.app"
                BlueprintName = "Tabata"
                ReferencedContainer = "container:Tabata.xcodeproj">
@@ -30,23 +30,13 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B9442AFEA136562E8A9B9785"
+            BlueprintIdentifier = "2C5B726C4C981F0671E1ADEC"
             BuildableName = "Tabata.app"
             BlueprintName = "Tabata"
             ReferencedContainer = "container:Tabata.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "861F710E1EB480D10F683CB2"
-               BuildableName = "TabataTests.xctest"
-               BlueprintName = "TabataTests"
-               ReferencedContainer = "container:Tabata.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -63,7 +53,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B9442AFEA136562E8A9B9785"
+            BlueprintIdentifier = "2C5B726C4C981F0671E1ADEC"
             BuildableName = "Tabata.app"
             BlueprintName = "Tabata"
             ReferencedContainer = "container:Tabata.xcodeproj">
@@ -80,7 +70,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B9442AFEA136562E8A9B9785"
+            BlueprintIdentifier = "2C5B726C4C981F0671E1ADEC"
             BuildableName = "Tabata.app"
             BlueprintName = "Tabata"
             ReferencedContainer = "container:Tabata.xcodeproj">

@@ -42,7 +42,15 @@ final class PhoneConnectivity: NSObject, WCSessionDelegate {
     }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-        guard let command = WatchCommandPayload.fromPayloadDictionary(message) else {
+        receive(message)
+    }
+
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
+        receive(userInfo)
+    }
+
+    private nonisolated func receive(_ dictionary: [String: Any]) {
+        guard let command = WatchCommandPayload.fromPayloadDictionary(dictionary) else {
             return
         }
 

@@ -68,6 +68,49 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertEqual(engine.state.remaining(at: start.addingTimeInterval(105)), 8)
     }
 
+    func testToggleRunningStartsPausesResumesAndRestartsCompleteWorkout() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+
+        engine.toggleRunning(now: start)
+
+        XCTAssertEqual(engine.state.phase, .work)
+        XCTAssertTrue(engine.state.isRunning)
+
+        engine.toggleRunning(now: start.addingTimeInterval(3))
+
+        XCTAssertFalse(engine.state.isRunning)
+        XCTAssertEqual(engine.state.remaining(at: start.addingTimeInterval(100)), 17)
+
+        engine.toggleRunning(now: start.addingTimeInterval(30))
+
+        XCTAssertTrue(engine.state.isRunning)
+        XCTAssertEqual(engine.state.remaining(at: start.addingTimeInterval(30)), 17)
+
+        _ = engine.tick(now: start.addingTimeInterval(270))
+
+        XCTAssertEqual(engine.state.phase, .complete)
+
+        engine.toggleRunning(now: start.addingTimeInterval(300))
+
+        XCTAssertEqual(engine.state.phase, .work)
+        XCTAssertEqual(engine.state.round, 1)
+        XCTAssertTrue(engine.state.isRunning)
+    }
+
+    func testLongTimeJumpLandsInCorrectPhase() {
+        let start = Date(timeIntervalSince1970: 100)
+        let config = TabataConfig(rounds: 3, workDuration: 20, restDuration: 10)
+        var engine = TabataEngine(state: .idle(config: config))
+
+        engine.start(now: start)
+        let state = engine.tick(now: start.addingTimeInterval(65))
+
+        XCTAssertEqual(state.phase, .work)
+        XCTAssertEqual(state.round, 3)
+        XCTAssertEqual(state.remaining(at: start.addingTimeInterval(65)), 15)
+    }
+
     func testCountdownCuePolicy() {
         let start = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()
@@ -82,6 +125,27 @@ final class TabataCoreTests: XCTestCase {
 
         XCTAssertNil(TabataCuePolicy.countdownCue(in: restState, now: start.addingTimeInterval(26)))
         XCTAssertEqual(TabataCuePolicy.countdownCue(in: restState, now: start.addingTimeInterval(27))?.second, 3)
+    }
+
+    func testTransitionCuePolicySuppressesStartAndUnchangedState() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+        let idleState = engine.state
+
+        engine.start(now: start)
+        let workState = engine.state
+
+        XCTAssertFalse(TabataCuePolicy.needsTransitionCue(from: idleState, to: workState))
+        XCTAssertFalse(TabataCuePolicy.needsTransitionCue(from: workState, to: workState))
+
+        let restState = engine.tick(now: start.addingTimeInterval(20))
+
+        XCTAssertTrue(TabataCuePolicy.needsTransitionCue(from: workState, to: restState))
+
+        var mutedRestState = restState
+        mutedRestState.soundsEnabled = false
+
+        XCTAssertFalse(TabataCuePolicy.needsTransitionCue(from: workState, to: mutedRestState))
     }
 
     func testSoundsToggleSuppressesCues() {
@@ -105,5 +169,71 @@ final class TabataCoreTests: XCTestCase {
 
         XCTAssertFalse(engine.state.soundsEnabled)
         XCTAssertEqual(engine.state.phase, .idle)
+    }
+
+    func testStatePayloadRoundTrips() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+
+        engine.start(now: start)
+        engine.pause(now: start.addingTimeInterval(7))
+
+        let decoded = TabataState.fromPayloadDictionary(engine.state.payloadDictionary())
+
+        XCTAssertEqual(decoded, engine.state)
+    }
+
+    func testWatchCommandPayloadRoundTripsForFallbackDelivery() {
+        let payload = WatchCommandPayload(command: .setSoundsEnabled, soundsEnabled: false)
+        let decoded = WatchCommandPayload.fromPayloadDictionary(payload.payloadDictionary())
+
+        XCTAssertEqual(decoded?.command, .setSoundsEnabled)
+        XCTAssertEqual(decoded?.soundsEnabled, false)
+    }
+
+    func testInvalidPayloadsReturnNil() {
+        XCTAssertNil(TabataState.fromPayloadDictionary(["phase": "bogus"]))
+        XCTAssertNil(WatchCommandPayload.fromPayloadDictionary(["command": "bogus"]))
+        XCTAssertNil(WatchCommandPayload.fromPayloadDictionary(["command": Date()]))
+    }
+
+    func testPresentationForIdleRunningPausedAndCompleteStates() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+
+        let idle = TabataPresentation(state: engine.state)
+
+        XCTAssertEqual(idle.title, "Tabata")
+        XCTAssertEqual(idle.phoneRoundText, "8 rounds")
+        XCTAssertEqual(idle.watchRoundText, "8 rounds")
+        XCTAssertEqual(idle.primaryButtonTitle, "Start")
+        XCTAssertEqual(idle.primaryAction, .toggleRunning)
+        XCTAssertTrue(idle.isPrimaryButtonProminent)
+        XCTAssertFalse(idle.showsReset)
+
+        engine.start(now: start)
+        let work = TabataPresentation(state: engine.state)
+
+        XCTAssertEqual(work.title, "WORK")
+        XCTAssertEqual(work.phoneRoundText, "Round 1 of 8")
+        XCTAssertEqual(work.watchRoundText, "1 / 8")
+        XCTAssertEqual(work.primaryButtonTitle, "Pause")
+        XCTAssertFalse(work.isPrimaryButtonProminent)
+
+        engine.pause(now: start.addingTimeInterval(5))
+        let paused = TabataPresentation(state: engine.state)
+
+        XCTAssertEqual(paused.title, "PAUSED")
+        XCTAssertEqual(paused.primaryButtonTitle, "Resume")
+        XCTAssertTrue(paused.isPrimaryButtonProminent)
+        XCTAssertTrue(paused.showsReset)
+
+        engine.resume(now: start.addingTimeInterval(10))
+        let complete = TabataPresentation(state: engine.tick(now: start.addingTimeInterval(260)))
+
+        XCTAssertEqual(complete.title, "DONE")
+        XCTAssertEqual(complete.phoneRoundText, "Complete")
+        XCTAssertEqual(complete.primaryButtonTitle, "Back Home")
+        XCTAssertEqual(complete.primaryAction, .reset)
     }
 }
