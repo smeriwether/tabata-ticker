@@ -154,17 +154,18 @@ jobs:
             -scheme "$SCHEME" \
             -configuration "$CONFIGURATION" \
             -sdk iphoneos \
-            -destination 'platform=iOS,name=Any iOS Device' \
+            -destination 'generic/platform=iOS' \
             archive
 
       - name: Archive
         run: |
-          xcodebuild clean archive \
+          rm -rf "$ARCHIVE_PATH" "$EXPORT_PATH"
+          xcodebuild archive \
             -project Tabata.xcodeproj \
             -scheme "$SCHEME" \
             -configuration "$CONFIGURATION" \
             -sdk iphoneos \
-            -destination 'platform=iOS,name=Any iOS Device' \
+            -destination 'generic/platform=iOS' \
             -archivePath "$ARCHIVE_PATH" \
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
