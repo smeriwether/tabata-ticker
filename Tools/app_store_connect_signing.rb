@@ -108,9 +108,11 @@ def run_command(*args)
 end
 
 def find_or_create_bundle_id(client, identifier:, name:)
-  query = URI.encode_www_form("filter[identifier]" => identifier, "limit" => 1)
+  query = URI.encode_www_form("filter[identifier]" => identifier, "limit" => 200)
   response = client.get("/v1/bundleIds?#{query}")
-  existing = response.fetch("data", []).first
+  existing = response.fetch("data", []).find do |bundle_id|
+    bundle_id.fetch("attributes").fetch("identifier") == identifier
+  end
   return existing.fetch("id") if existing
 
   puts "Creating Bundle ID #{identifier}"
