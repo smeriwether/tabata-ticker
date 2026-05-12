@@ -185,6 +185,45 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertEqual(engine.state.phase, .idle)
     }
 
+    func testPresetNameUsesWorkRestAndRounds() {
+        let config = TabataConfig.preset(workSeconds: 45, restSeconds: 15, rounds: 6)
+
+        XCTAssertEqual(config.presetName, "45/15/6")
+    }
+
+    func testPresetCatalogDefaultsToClassicAndSelectedPreset() {
+        let custom = TabataPreset(
+            id: "custom",
+            config: TabataConfig.preset(workSeconds: 40, restSeconds: 20, rounds: 5),
+            isDefault: false
+        )
+        let catalog = TabataPresetCatalog(customPresets: [custom], selectedID: "custom")
+
+        XCTAssertEqual(catalog.presets.map(\.name), ["20/10/8", "40/20/5"])
+        XCTAssertEqual(catalog.selectedPreset, custom)
+    }
+
+    func testPresetCatalogProtectsDefaultPreset() {
+        var catalog = TabataPresetCatalog()
+
+        XCTAssertFalse(catalog.deleteUserPreset(id: TabataPreset.defaultID))
+        XCTAssertFalse(catalog.updateUserPreset(id: TabataPreset.defaultID, config: TabataConfig.preset(workSeconds: 30, restSeconds: 15, rounds: 4)))
+        XCTAssertEqual(catalog.selectedPreset, .classic)
+    }
+
+    func testPresetCatalogAllowsDuplicatesAndCapsAtFourTotalPresets() {
+        var catalog = TabataPresetCatalog()
+
+        XCTAssertNotNil(catalog.addUserPreset(config: TabataConfig.preset(workSeconds: 30, restSeconds: 15, rounds: 4), id: "one"))
+        XCTAssertNotNil(catalog.addUserPreset(config: TabataConfig.preset(workSeconds: 30, restSeconds: 15, rounds: 4), id: "duplicate"))
+        XCTAssertNotNil(catalog.addUserPreset(config: TabataConfig.preset(workSeconds: 45, restSeconds: 15, rounds: 5), id: "two"))
+        XCTAssertNil(catalog.addUserPreset(config: TabataConfig.preset(workSeconds: 60, restSeconds: 30, rounds: 6), id: "three"))
+
+        XCTAssertEqual(catalog.presets.count, 4)
+        XCTAssertEqual(catalog.userPresets.map(\.name), ["30/15/4", "30/15/4", "45/15/5"])
+        XCTAssertFalse(catalog.canCreatePreset)
+    }
+
     func testStatePayloadRoundTrips() {
         let start = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()
@@ -249,5 +288,13 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertEqual(complete.phoneRoundText, "Complete")
         XCTAssertEqual(complete.primaryButtonTitle, "Back Home")
         XCTAssertEqual(complete.primaryAction, .reset)
+    }
+
+    func testPresentationUsesSelectedConfigForIdleRounds() {
+        let state = TabataState.idle(config: TabataConfig.preset(workSeconds: 45, restSeconds: 15, rounds: 6))
+        let presentation = TabataPresentation(state: state)
+
+        XCTAssertEqual(presentation.phoneRoundText, "6 rounds")
+        XCTAssertEqual(presentation.watchRoundText, "6 rounds")
     }
 }

@@ -96,7 +96,8 @@ struct WatchContentView: View {
 
     private var timeText: String {
         let remaining = Int(ceil(viewModel.state.remaining(at: viewModel.now)))
-        return String(format: "0:%02d", max(0, remaining))
+        let seconds = max(0, remaining)
+        return String(format: "%d:%02d", seconds / 60, seconds % 60)
     }
 
     private var backgroundColors: [Color] {

@@ -13,6 +13,161 @@ struct TabataConfig: Codable, Equatable, Sendable {
     var restDuration: TimeInterval
 
     static let classic = TabataConfig(rounds: 8, workDuration: 20, restDuration: 10)
+
+    static func preset(workSeconds: Int, restSeconds: Int, rounds: Int) -> TabataConfig {
+        TabataConfig(
+            rounds: rounds,
+            workDuration: TimeInterval(workSeconds),
+            restDuration: TimeInterval(restSeconds)
+        )
+    }
+
+    var workSeconds: Int {
+        Int(workDuration.rounded())
+    }
+
+    var restSeconds: Int {
+        Int(restDuration.rounded())
+    }
+
+    var presetName: String {
+        "\(workSeconds)/\(restSeconds)/\(rounds)"
+    }
+}
+
+struct TabataPreset: Codable, Equatable, Identifiable, Sendable {
+    static let defaultID = "classic"
+    static let classic = TabataPreset(id: defaultID, config: .classic, isDefault: true)
+
+    var id: String
+    var config: TabataConfig
+    var isDefault: Bool
+
+    var name: String {
+        config.presetName
+    }
+}
+
+struct TabataPresetCatalog: Equatable, Sendable {
+    static let maxPresetCount = 4
+
+    private(set) var presets: [TabataPreset]
+    private(set) var selectedID: String
+
+    init(customPresets: [TabataPreset] = [], selectedID: String? = nil) {
+        let userPresets = Self.cleanUserPresets(customPresets)
+        presets = [TabataPreset.classic] + userPresets
+
+        if let selectedID, presets.contains(where: { $0.id == selectedID }) {
+            self.selectedID = selectedID
+        } else {
+            self.selectedID = TabataPreset.defaultID
+        }
+    }
+
+    var selectedPreset: TabataPreset {
+        presets.first { $0.id == selectedID } ?? .classic
+    }
+
+    var userPresets: [TabataPreset] {
+        presets.filter { !$0.isDefault }
+    }
+
+    var canCreatePreset: Bool {
+        presets.count < Self.maxPresetCount
+    }
+
+    @discardableResult
+    mutating func selectPreset(id: String) -> Bool {
+        guard presets.contains(where: { $0.id == id }) else {
+            return false
+        }
+
+        selectedID = id
+        return true
+    }
+
+    mutating func addUserPreset(config: TabataConfig, id: String = UUID().uuidString) -> TabataPreset? {
+        guard canCreatePreset else {
+            return nil
+        }
+
+        let preset = TabataPreset(id: id, config: config, isDefault: false)
+        presets.append(preset)
+        selectedID = preset.id
+        return preset
+    }
+
+    @discardableResult
+    mutating func updateUserPreset(id: String, config: TabataConfig) -> Bool {
+        guard let index = presets.firstIndex(where: { $0.id == id && !$0.isDefault }) else {
+            return false
+        }
+
+        presets[index].config = config
+        return true
+    }
+
+    @discardableResult
+    mutating func deleteUserPreset(id: String) -> Bool {
+        guard let index = presets.firstIndex(where: { $0.id == id && !$0.isDefault }) else {
+            return false
+        }
+
+        presets.remove(at: index)
+        if selectedID == id {
+            selectedID = TabataPreset.defaultID
+        }
+        return true
+    }
+
+    private static func cleanUserPresets(_ presets: [TabataPreset]) -> [TabataPreset] {
+        var cleaned: [TabataPreset] = []
+
+        for preset in presets where !preset.isDefault && preset.id != TabataPreset.defaultID {
+            guard cleaned.count < maxPresetCount - 1 else {
+                continue
+            }
+
+            cleaned.append(TabataPreset(id: preset.id, config: preset.config, isDefault: false))
+        }
+
+        return cleaned
+    }
+}
+
+struct TabataPresetStore {
+    private static let customPresetsKey = "tabataPreset.customPresets"
+    private static let selectedPresetIDKey = "tabataPreset.selectedPresetID"
+
+    private let defaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    func loadCatalog() -> TabataPresetCatalog {
+        TabataPresetCatalog(
+            customPresets: loadUserPresets(),
+            selectedID: defaults.string(forKey: Self.selectedPresetIDKey)
+        )
+    }
+
+    func save(_ catalog: TabataPresetCatalog) {
+        let encoder = JSONEncoder()
+        if let data = try? encoder.encode(catalog.userPresets) {
+            defaults.set(data, forKey: Self.customPresetsKey)
+        }
+        defaults.set(catalog.selectedID, forKey: Self.selectedPresetIDKey)
+    }
+
+    private func loadUserPresets() -> [TabataPreset] {
+        guard let data = defaults.data(forKey: Self.customPresetsKey) else {
+            return []
+        }
+
+        return (try? JSONDecoder().decode([TabataPreset].self, from: data)) ?? []
+    }
 }
 
 struct TabataState: Codable, Equatable, Sendable {
@@ -103,8 +258,8 @@ struct TabataPresentation: Equatable, Sendable {
 
         switch state.phase {
         case .idle:
-            phoneRoundText = "8 rounds"
-            watchRoundText = "8 rounds"
+            phoneRoundText = "\(state.config.rounds) rounds"
+            watchRoundText = "\(state.config.rounds) rounds"
         case .complete:
             phoneRoundText = "Complete"
             watchRoundText = "Complete"

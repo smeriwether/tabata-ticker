@@ -8,6 +8,7 @@ import UIKit
 final class WorkoutViewModel {
     private(set) var state: TabataState
     private(set) var now: Date
+    private(set) var presetCatalog: TabataPresetCatalog
 
     private static let soundsEnabledKey = "soundsEnabled"
     private static let hapticsEnabledKey = "hapticsEnabled"
@@ -15,6 +16,7 @@ final class WorkoutViewModel {
     @ObservationIgnored
     private var engine: TabataEngine
     private let defaults: UserDefaults
+    private let presetStore: TabataPresetStore
     private let connectivity = PhoneConnectivity()
     private let cuePerformer = PhoneCuePerformer()
     private let liveActivityController = TabataLiveActivityController()
@@ -27,8 +29,12 @@ final class WorkoutViewModel {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        let presetStore = TabataPresetStore(defaults: defaults)
+        self.presetStore = presetStore
+        let presetCatalog = presetStore.loadCatalog()
+        self.presetCatalog = presetCatalog
 
-        var initialState = TabataState.idle()
+        var initialState = TabataState.idle(config: presetCatalog.selectedPreset.config)
         if defaults.object(forKey: Self.soundsEnabledKey) != nil {
             initialState.soundsEnabled = defaults.bool(forKey: Self.soundsEnabledKey)
         }
@@ -39,6 +45,18 @@ final class WorkoutViewModel {
         state = initialState
         now = Date()
         engine = TabataEngine(state: initialState)
+    }
+
+    var presets: [TabataPreset] {
+        presetCatalog.presets
+    }
+
+    var selectedPreset: TabataPreset {
+        presetCatalog.selectedPreset
+    }
+
+    var canCreatePreset: Bool {
+        presetCatalog.canCreatePreset
     }
 
     func activate() {
@@ -89,7 +107,12 @@ final class WorkoutViewModel {
 
     func reset() {
         now = Date()
-        engine.reset()
+        let soundsEnabled = state.soundsEnabled
+        let hapticsEnabled = state.hapticsEnabled
+        var resetState = TabataState.idle(config: selectedPreset.config)
+        resetState.soundsEnabled = soundsEnabled
+        resetState.hapticsEnabled = hapticsEnabled
+        engine = TabataEngine(state: resetState)
         state = engine.state
         lastCountdownCue = nil
         updateIdleTimer()
@@ -104,6 +127,54 @@ final class WorkoutViewModel {
         state = engine.state
         lastCountdownCue = nil
         sendState()
+    }
+
+    func selectPreset(_ preset: TabataPreset) {
+        guard state.phase == .idle, presetCatalog.selectPreset(id: preset.id) else {
+            return
+        }
+
+        presetStore.save(presetCatalog)
+        resetToSelectedPreset()
+    }
+
+    @discardableResult
+    func createPreset(config: TabataConfig) -> Bool {
+        guard presetCatalog.addUserPreset(config: config) != nil else {
+            return false
+        }
+
+        presetStore.save(presetCatalog)
+        resetToSelectedPreset()
+        return true
+    }
+
+    @discardableResult
+    func updatePreset(id: String, config: TabataConfig) -> Bool {
+        let wasSelected = presetCatalog.selectedID == id
+        guard presetCatalog.updateUserPreset(id: id, config: config) else {
+            return false
+        }
+
+        presetStore.save(presetCatalog)
+        if wasSelected, state.phase == .idle || state.phase == .complete {
+            resetToSelectedPreset()
+        }
+        return true
+    }
+
+    @discardableResult
+    func deletePreset(id: String) -> Bool {
+        let wasSelected = presetCatalog.selectedID == id
+        guard presetCatalog.deleteUserPreset(id: id) else {
+            return false
+        }
+
+        presetStore.save(presetCatalog)
+        if wasSelected, state.phase == .idle || state.phase == .complete {
+            resetToSelectedPreset()
+        }
+        return true
     }
 
     func setHapticsEnabled(_ enabled: Bool) {
@@ -133,6 +204,22 @@ final class WorkoutViewModel {
     private func syncLiveActivity() {
         liveActivityController.sync(state: state, now: now)
         scheduleLiveActivityPhaseRefresh()
+    }
+
+    private func resetToSelectedPreset() {
+        let soundsEnabled = state.soundsEnabled
+        let hapticsEnabled = state.hapticsEnabled
+        now = Date()
+
+        var selectedState = TabataState.idle(config: selectedPreset.config)
+        selectedState.soundsEnabled = soundsEnabled
+        selectedState.hapticsEnabled = hapticsEnabled
+        engine = TabataEngine(state: selectedState)
+        state = selectedState
+        lastCountdownCue = nil
+        updateIdleTimer()
+        sendState()
+        syncLiveActivity()
     }
 
     private func scheduleLiveActivityPhaseRefresh() {
