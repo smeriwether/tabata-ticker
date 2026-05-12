@@ -6,60 +6,70 @@ import WidgetKit
 struct TabataLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: TabataLiveActivityAttributes.self) { context in
-            TabataLiveActivityLockScreenView(state: context.state)
-                .activityBackgroundTint(.black.opacity(0.88))
-                .activitySystemActionForegroundColor(.white)
+            TabataLiveActivityTimelineView(state: context.state) { display in
+                TabataLiveActivityLockScreenView(display: display)
+            }
+            .activityBackgroundTint(.black.opacity(0.88))
+            .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.bottom) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(alignment: .center, spacing: 10) {
-                            TabataLiveActivityPhaseLabel(state: context.state, dotSize: 6)
+                    TabataLiveActivityTimelineView(state: context.state) { display in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack(alignment: .center, spacing: 10) {
+                                TabataLiveActivityPhaseLabel(display: display, dotSize: 6)
 
-                            Spacer(minLength: 10)
+                                Spacer(minLength: 10)
 
-                            Text(context.state.roundDisplayText)
-                                .font(.caption.monospacedDigit().weight(.bold))
-                                .foregroundStyle(.white.opacity(0.88))
-                                .lineLimit(1)
-                                .padding(.horizontal, 9)
-                                .padding(.vertical, 4)
-                                .background(.white.opacity(0.10), in: Capsule())
+                                Text(display.roundText)
+                                    .font(.caption.monospacedDigit().weight(.bold))
+                                    .foregroundStyle(.white.opacity(0.88))
+                                    .lineLimit(1)
+                                    .padding(.horizontal, 9)
+                                    .padding(.vertical, 4)
+                                    .background(.white.opacity(0.10), in: Capsule())
+                            }
+
+                            HStack(alignment: .lastTextBaseline, spacing: 10) {
+                                TabataLiveActivityTimerText(display: display)
+                                    .font(.system(size: 43, weight: .black, design: .rounded).monospacedDigit())
+                                    .foregroundStyle(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.9)
+
+                                Spacer(minLength: 8)
+
+                                Text(display.statusText)
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(display.tint)
+                                    .textCase(.uppercase)
+                                    .lineLimit(1)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(display.tint.opacity(0.16), in: Capsule())
+                            }
+
+                            TabataLiveActivityProgressBar(display: display, height: 5)
                         }
-
-                        HStack(alignment: .lastTextBaseline, spacing: 10) {
-                            TabataLiveActivityTimerText(state: context.state)
-                                .font(.system(size: 43, weight: .black, design: .rounded).monospacedDigit())
-                                .foregroundStyle(.white)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.9)
-
-                            Spacer(minLength: 8)
-
-                            Text(context.state.statusText)
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(context.state.tint)
-                                .textCase(.uppercase)
-                                .lineLimit(1)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(context.state.tint.opacity(0.16), in: Capsule())
-                        }
-
-                        TabataLiveActivityProgressBar(state: context.state, height: 5)
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
                 }
             } compactLeading: {
-                TabataLiveActivityPhaseIcon(state: context.state, size: 17, iconSize: 9)
+                TabataLiveActivityTimelineView(state: context.state) { display in
+                    TabataLiveActivityPhaseIcon(display: display, size: 17, iconSize: 9)
+                }
             } compactTrailing: {
-                TabataLiveActivityTimerText(state: context.state)
-                    .font(.system(size: 13, weight: .bold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
+                TabataLiveActivityTimelineView(state: context.state) { display in
+                    TabataLiveActivityTimerText(display: display)
+                        .font(.system(size: 13, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
+                }
             } minimal: {
-                TabataLiveActivityPhaseIcon(state: context.state, size: 14, iconSize: 8)
+                TabataLiveActivityTimelineView(state: context.state) { display in
+                    TabataLiveActivityPhaseIcon(display: display, size: 14, iconSize: 8)
+                }
             }
             .keylineTint(context.state.tint)
             .contentMargins(.horizontal, 24, for: .expanded)
@@ -68,17 +78,28 @@ struct TabataLiveActivityWidget: Widget {
     }
 }
 
-private struct TabataLiveActivityLockScreenView: View {
+private struct TabataLiveActivityTimelineView<Content: View>: View {
     let state: TabataLiveActivityAttributes.ContentState
+    let content: (TabataLiveActivityDisplayState) -> Content
+
+    var body: some View {
+        TimelineView(.periodic(from: state.startsAt, by: 1)) { context in
+            content(state.displayState(at: context.date))
+        }
+    }
+}
+
+private struct TabataLiveActivityLockScreenView: View {
+    let display: TabataLiveActivityDisplayState
 
     var body: some View {
         VStack(alignment: .leading, spacing: 11) {
             HStack(alignment: .center, spacing: 10) {
-                TabataLiveActivityPhaseLabel(state: state, dotSize: 7)
+                TabataLiveActivityPhaseLabel(display: display, dotSize: 7)
 
                 Spacer(minLength: 10)
 
-                Text("Round \(state.roundText)")
+                Text("Round \(display.roundText)")
                     .font(.caption.monospacedDigit().weight(.bold))
                     .foregroundStyle(.white.opacity(0.88))
                     .lineLimit(1)
@@ -88,24 +109,24 @@ private struct TabataLiveActivityLockScreenView: View {
             }
 
             HStack(alignment: .lastTextBaseline, spacing: 12) {
-                TabataLiveActivityTimerText(state: state)
+                TabataLiveActivityTimerText(display: display)
                     .font(.system(size: 50, weight: .black, design: .rounded).monospacedDigit())
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
 
                 Spacer(minLength: 12)
 
-                Text(state.statusText)
+                Text(display.statusText)
                     .font(.caption2.weight(.heavy))
-                    .foregroundStyle(state.tint)
+                    .foregroundStyle(display.tint)
                     .textCase(.uppercase)
                     .lineLimit(1)
                     .padding(.horizontal, 9)
                     .padding(.vertical, 5)
-                    .background(state.tint.opacity(0.16), in: Capsule())
+                    .background(display.tint.opacity(0.16), in: Capsule())
             }
 
-            TabataLiveActivityProgressBar(state: state, height: 6)
+            TabataLiveActivityProgressBar(display: display, height: 6)
         }
         .foregroundStyle(.white)
         .padding(.vertical, 14)
@@ -114,14 +135,14 @@ private struct TabataLiveActivityLockScreenView: View {
 }
 
 private struct TabataLiveActivityPhaseLabel: View {
-    let state: TabataLiveActivityAttributes.ContentState
+    let display: TabataLiveActivityDisplayState
     let dotSize: CGFloat
 
     var body: some View {
         HStack(spacing: 8) {
-            TabataLiveActivityPhaseIcon(state: state, size: dotSize + 11, iconSize: max(8, dotSize))
+            TabataLiveActivityPhaseIcon(display: display, size: dotSize + 11, iconSize: max(8, dotSize))
 
-            Text(state.title)
+            Text(display.title)
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
                 .lineLimit(1)
@@ -131,35 +152,29 @@ private struct TabataLiveActivityPhaseLabel: View {
 }
 
 private struct TabataLiveActivityPhaseIcon: View {
-    let state: TabataLiveActivityAttributes.ContentState
+    let display: TabataLiveActivityDisplayState
     let size: CGFloat
     let iconSize: CGFloat
 
     var body: some View {
-        Image(systemName: state.phaseIconName)
+        Image(systemName: display.phaseIconName)
             .font(.system(size: iconSize, weight: .black))
             .foregroundStyle(.white)
             .frame(width: size, height: size)
-            .background(state.tint, in: Circle())
+            .background(display.tint, in: Circle())
     }
 }
 
 private struct TabataLiveActivityTimerText: View {
-    let state: TabataLiveActivityAttributes.ContentState
+    let display: TabataLiveActivityDisplayState
 
     var body: some View {
-        Group {
-            if state.isRunning {
-                Text(timerInterval: state.timerInterval, countsDown: true)
-            } else {
-                Text(state.remainingText)
-            }
-        }
+        Text(display.remainingText)
     }
 }
 
 private struct TabataLiveActivityProgressBar: View {
-    let state: TabataLiveActivityAttributes.ContentState
+    let display: TabataLiveActivityDisplayState
     let height: CGFloat
 
     var body: some View {
@@ -167,22 +182,11 @@ private struct TabataLiveActivityProgressBar: View {
             Capsule()
                 .fill(.white.opacity(0.22))
 
-            if state.isRunning {
-                ProgressView(timerInterval: state.timerInterval, countsDown: false) {
-                    EmptyView()
-                } currentValueLabel: {
-                    EmptyView()
-                }
-                .progressViewStyle(.linear)
-                .tint(state.tint)
-                .shadow(color: state.tint.opacity(0.55), radius: 4)
-            } else {
-                GeometryReader { proxy in
-                    Capsule()
-                        .fill(state.tint)
-                        .frame(width: proxy.size.width * state.elapsedFraction)
-                        .shadow(color: state.tint.opacity(0.55), radius: 4)
-                }
+            GeometryReader { proxy in
+                Capsule()
+                    .fill(display.tint)
+                    .frame(width: proxy.size.width * display.elapsedFraction)
+                    .shadow(color: display.tint.opacity(0.55), radius: 4)
             }
         }
         .frame(height: height)
@@ -190,31 +194,14 @@ private struct TabataLiveActivityProgressBar: View {
     }
 }
 
-private extension TabataLiveActivityAttributes.ContentState {
+private extension TabataLiveActivityDisplayState {
     var tint: Color {
         Color(red: tintRed, green: tintGreen, blue: tintBlue)
     }
+}
 
-    var statusText: String {
-        isRunning ? "Active" : "Paused"
-    }
-
-    var roundDisplayText: String {
-        roundText.replacingOccurrences(of: "/", with: " / ")
-    }
-
-    var phaseIconName: String {
-        if !isRunning {
-            return "pause.fill"
-        }
-
-        switch title {
-        case "WORK":
-            return "bolt.fill"
-        case "REST":
-            return "pause.fill"
-        default:
-            return "timer"
-        }
+private extension TabataLiveActivityAttributes.ContentState {
+    var tint: Color {
+        Color(red: tintRed, green: tintGreen, blue: tintBlue)
     }
 }

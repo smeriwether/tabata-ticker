@@ -72,12 +72,13 @@ final class WatchWorkoutViewModel {
     }
 
     func toggleRunning() {
+        let command = nextRunningCommand
         now = Date()
         engine.toggleRunning(now: now)
         state = engine.state
         lastCountdownCue = nil
         syncRunningState()
-        connectivity.send(WatchCommandPayload(command: .toggleRunning, soundsEnabled: nil))
+        connectivity.send(WatchCommandPayload(command: command, soundsEnabled: nil))
     }
 
     func reset() {
@@ -107,6 +108,14 @@ final class WatchWorkoutViewModel {
         engine = TabataEngine(state: newState)
         lastCountdownCue = nil
         syncRunningState()
+    }
+
+    private var nextRunningCommand: WatchCommand {
+        if state.phase == .idle || state.phase == .complete {
+            return .start
+        }
+
+        return state.isRunning ? .pause : .resume
     }
 
     private func syncRunningState() {
@@ -144,8 +153,8 @@ final class WatchWorkoutViewModel {
 
 private final class WatchRuntimeSessionController: NSObject, WKExtendedRuntimeSessionDelegate {
     private var session: WKExtendedRuntimeSession?
+    private var restartWorkItem: DispatchWorkItem?
     private var wantsSession = false
-    private var canStartSession = true
 
     func setRunning(_ isRunning: Bool) {
         wantsSession = isRunning
@@ -153,16 +162,19 @@ private final class WatchRuntimeSessionController: NSObject, WKExtendedRuntimeSe
         if isRunning {
             start()
         } else {
-            canStartSession = true
+            restartWorkItem?.cancel()
+            restartWorkItem = nil
             stop()
         }
     }
 
     private func start() {
-        guard canStartSession, session == nil else {
+        guard session == nil else {
             return
         }
 
+        restartWorkItem?.cancel()
+        restartWorkItem = nil
         let session = WKExtendedRuntimeSession()
         session.delegate = self
         self.session = session
@@ -189,8 +201,22 @@ private final class WatchRuntimeSessionController: NSObject, WKExtendedRuntimeSe
 
         session = nil
         if wantsSession {
-            canStartSession = false
+            scheduleRestart()
         }
+    }
+
+    private func scheduleRestart() {
+        restartWorkItem?.cancel()
+
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self, self.wantsSession, self.session == nil else {
+                return
+            }
+
+            self.start()
+        }
+        restartWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: workItem)
     }
 }
 

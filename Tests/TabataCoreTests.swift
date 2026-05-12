@@ -237,11 +237,11 @@ final class TabataCoreTests: XCTestCase {
     }
 
     func testWatchCommandPayloadRoundTripsForFallbackDelivery() {
-        let payload = WatchCommandPayload(command: .setSoundsEnabled, soundsEnabled: false)
+        let payload = WatchCommandPayload(command: .pause, soundsEnabled: nil)
         let decoded = WatchCommandPayload.fromPayloadDictionary(payload.payloadDictionary())
 
-        XCTAssertEqual(decoded?.command, .setSoundsEnabled)
-        XCTAssertEqual(decoded?.soundsEnabled, false)
+        XCTAssertEqual(decoded?.command, .pause)
+        XCTAssertNil(decoded?.soundsEnabled)
     }
 
     func testInvalidPayloadsReturnNil() {

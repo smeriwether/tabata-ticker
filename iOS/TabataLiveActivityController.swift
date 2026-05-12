@@ -14,7 +14,7 @@ final class TabataLiveActivityController {
         let contentState = TabataLiveActivityAttributes.ContentState(state: state, now: now)
         let content = ActivityContent(
             state: contentState,
-            staleDate: contentState.isRunning ? contentState.endsAt : nil,
+            staleDate: contentState.isRunning ? contentState.workoutEndsAt : nil,
             relevanceScore: contentState.isRunning ? 1 : 0.5
         )
 
@@ -72,8 +72,14 @@ private extension TabataLiveActivityAttributes.ContentState {
         roundText = "\(state.round)/\(state.config.rounds)"
         symbol = Self.symbol(for: state)
         isRunning = state.isRunning
+        phase = state.phase.rawValue
+        round = state.round
+        totalRounds = state.config.rounds
+        workDurationSeconds = max(1, Int(ceil(state.config.workDuration)))
+        restDurationSeconds = max(1, Int(ceil(state.config.restDuration)))
         startsAt = state.phaseStartedAt ?? now
         endsAt = now.addingTimeInterval(TimeInterval(phaseRemaining))
+        workoutEndsAt = now.addingTimeInterval(Self.workoutRemainingDuration(for: state, now: now))
         remainingSeconds = phaseRemaining
         phaseDurationSeconds = max(1, Int(ceil(state.phaseDuration)))
         tintRed = tint.red
@@ -93,6 +99,27 @@ private extension TabataLiveActivityAttributes.ContentState {
             return "R"
         case .idle, .complete:
             return "T"
+        }
+    }
+
+    private static func workoutRemainingDuration(for state: TabataState, now: Date) -> TimeInterval {
+        guard state.isRunning, state.isWorkoutPhase else {
+            return state.remaining(at: now)
+        }
+
+        let phaseRemaining = state.remaining(at: now)
+        let fullFutureRoundDuration = state.config.workDuration + state.config.restDuration
+
+        switch state.phase {
+        case .work:
+            return phaseRemaining
+                + state.config.restDuration
+                + TimeInterval(max(0, state.config.rounds - state.round)) * fullFutureRoundDuration
+        case .rest:
+            return phaseRemaining
+                + TimeInterval(max(0, state.config.rounds - state.round)) * fullFutureRoundDuration
+        case .idle, .complete:
+            return 0
         }
     }
 }

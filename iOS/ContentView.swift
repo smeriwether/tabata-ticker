@@ -132,7 +132,6 @@ struct ContentView: View {
                 saveTitle: route.saveTitle,
                 initialConfig: initialConfig,
                 existingPresetID: preset?.id,
-                presets: viewModel.presets,
                 canCreatePreset: viewModel.canCreatePreset,
                 onSave: { config in
                     let didSave: Bool
@@ -606,9 +605,7 @@ private struct PresetEditorView: View {
 
     let title: String
     let saveTitle: String
-    let initialConfig: TabataConfig
     let existingPresetID: String?
-    let presets: [TabataPreset]
     let canCreatePreset: Bool
     let onSave: (TabataConfig) -> Bool
 
@@ -622,15 +619,12 @@ private struct PresetEditorView: View {
         saveTitle: String,
         initialConfig: TabataConfig,
         existingPresetID: String?,
-        presets: [TabataPreset],
         canCreatePreset: Bool,
         onSave: @escaping (TabataConfig) -> Bool
     ) {
         self.title = title
         self.saveTitle = saveTitle
-        self.initialConfig = initialConfig
         self.existingPresetID = existingPresetID
-        self.presets = presets
         self.canCreatePreset = canCreatePreset
         self.onSave = onSave
         _workSeconds = State(initialValue: Self.clamped(initialConfig.workSeconds, to: Self.workRange))

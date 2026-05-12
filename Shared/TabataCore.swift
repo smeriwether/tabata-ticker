@@ -468,7 +468,9 @@ enum TabataCuePolicy {
 }
 
 enum WatchCommand: String, Codable, Sendable {
-    case toggleRunning
+    case start
+    case pause
+    case resume
     case reset
     case setSoundsEnabled
 }
