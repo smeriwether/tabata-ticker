@@ -102,7 +102,12 @@ ios_target.build_configurations.each do |config|
   settings["IPHONEOS_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
   settings["TARGETED_DEVICE_FAMILY"] = "1,2"
-  settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon" if config.name == "Release"
+  if config.name == "Release"
+    settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
+    settings["CODE_SIGN_STYLE"] = "Manual"
+    settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
+    settings["PROVISIONING_PROFILE_SPECIFIER"] = "$(IOS_PROFILE_NAME)"
+  end
   settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
   settings["SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
   settings["SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
@@ -110,7 +115,12 @@ end
 
 watch_target.build_configurations.each do |config|
   settings = config.build_settings
-  settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon" if config.name == "Release"
+  if config.name == "Release"
+    settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
+    settings["CODE_SIGN_STYLE"] = "Manual"
+    settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
+    settings["PROVISIONING_PROFILE_SPECIFIER"] = "$(WATCH_PROFILE_NAME)"
+  end
   settings["PRODUCT_BUNDLE_IDENTIFIER"] = WATCH_BUNDLE_ID
   settings["WATCHOS_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = config.name == "Debug" ? "watchsimulator" : "watchos"
