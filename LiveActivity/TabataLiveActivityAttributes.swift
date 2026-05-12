@@ -10,6 +10,7 @@ struct TabataLiveActivityAttributes: ActivityAttributes {
         var startsAt: Date
         var endsAt: Date
         var remainingSeconds: Int
+        var phaseDurationSeconds: Int
         var tintRed: Double
         var tintGreen: Double
         var tintBlue: Double
@@ -26,5 +27,10 @@ extension TabataLiveActivityAttributes.ContentState {
     var remainingText: String {
         let seconds = max(0, remainingSeconds)
         return String(format: "%d:%02d", seconds / 60, seconds % 60)
+    }
+
+    var elapsedFraction: Double {
+        let duration = max(1, phaseDurationSeconds)
+        return min(1, max(0, 1 - (Double(remainingSeconds) / Double(duration))))
     }
 }

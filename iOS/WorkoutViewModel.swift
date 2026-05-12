@@ -22,6 +22,8 @@ final class WorkoutViewModel {
     private var lastCountdownCue: CountdownCue?
     @ObservationIgnored
     private var didActivate = false
+    @ObservationIgnored
+    private var liveActivityPhaseTask: Task<Void, Never>?
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -130,6 +132,31 @@ final class WorkoutViewModel {
 
     private func syncLiveActivity() {
         liveActivityController.sync(state: state, now: now)
+        scheduleLiveActivityPhaseRefresh()
+    }
+
+    private func scheduleLiveActivityPhaseRefresh() {
+        liveActivityPhaseTask?.cancel()
+
+        guard state.isRunning, state.isWorkoutPhase else {
+            liveActivityPhaseTask = nil
+            return
+        }
+
+        let delay = max(0.1, state.remaining(at: now) + 0.15)
+        liveActivityPhaseTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+            guard !Task.isCancelled, let self else {
+                return
+            }
+
+            let oldState = self.state
+            self.tick(now: Date())
+
+            if oldState == self.state {
+                self.scheduleLiveActivityPhaseRefresh()
+            }
+        }
     }
 
     private func updateIdleTimer() {

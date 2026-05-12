@@ -75,6 +75,7 @@ private extension TabataLiveActivityAttributes.ContentState {
         startsAt = state.phaseStartedAt ?? now
         endsAt = now.addingTimeInterval(TimeInterval(phaseRemaining))
         remainingSeconds = phaseRemaining
+        phaseDurationSeconds = max(1, Int(ceil(state.phaseDuration)))
         tintRed = tint.red
         tintGreen = tint.green
         tintBlue = tint.blue
