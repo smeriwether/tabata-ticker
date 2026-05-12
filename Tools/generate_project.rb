@@ -15,6 +15,7 @@ project = Xcodeproj::Project.new(PROJECT_PATH)
 ios_target = project.new_target(:application, "Tabata", :ios, "26.0")
 watch_target = project.new_target(:application, "Tabata Watch App", :watchos, "26.0")
 test_target = project.new_target(:unit_test_bundle, "TabataTests", :osx, "26.0")
+ios_target.add_dependency(watch_target)
 
 def add_sources(project, target, paths)
   paths.each do |path|
@@ -125,6 +126,7 @@ watch_target.build_configurations.each do |config|
   settings["PRODUCT_BUNDLE_IDENTIFIER"] = WATCH_BUNDLE_ID
   settings["WATCHOS_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = config.name == "Debug" ? "watchsimulator" : "watchos"
+  settings["SKIP_INSTALL"] = "YES"
   settings["SUPPORTED_PLATFORMS"] = config.name == "Debug" ? "watchsimulator" : "watchos"
   settings["TARGETED_DEVICE_FAMILY"] = "4"
   settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
