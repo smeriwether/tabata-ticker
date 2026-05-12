@@ -10,6 +10,7 @@ final class WorkoutViewModel {
     private(set) var now: Date
 
     private static let soundsEnabledKey = "soundsEnabled"
+    private static let hapticsEnabledKey = "hapticsEnabled"
 
     @ObservationIgnored
     private var engine: TabataEngine
@@ -27,6 +28,9 @@ final class WorkoutViewModel {
         var initialState = TabataState.idle()
         if defaults.object(forKey: Self.soundsEnabledKey) != nil {
             initialState.soundsEnabled = defaults.bool(forKey: Self.soundsEnabledKey)
+        }
+        if defaults.object(forKey: Self.hapticsEnabledKey) != nil {
+            initialState.hapticsEnabled = defaults.bool(forKey: Self.hapticsEnabledKey)
         }
 
         state = initialState
@@ -53,12 +57,12 @@ final class WorkoutViewModel {
         state = engine.tick(now: now)
         updateIdleTimer()
 
-        if TabataCuePolicy.needsTransitionCue(from: oldState, to: state) {
+        if state.soundsEnabled, TabataCuePolicy.needsTransitionCue(from: oldState, to: state) {
             cuePerformer.playTransition()
             lastCountdownCue = nil
         }
 
-        if let cue = TabataCuePolicy.countdownCue(in: state, now: now), cue != lastCountdownCue {
+        if state.soundsEnabled, let cue = TabataCuePolicy.countdownCue(in: state, now: now), cue != lastCountdownCue {
             cuePerformer.playCountdown()
             lastCountdownCue = cue
         }
@@ -90,6 +94,15 @@ final class WorkoutViewModel {
         now = Date()
         defaults.set(enabled, forKey: Self.soundsEnabledKey)
         engine.setSoundsEnabled(enabled)
+        state = engine.state
+        lastCountdownCue = nil
+        sendState()
+    }
+
+    func setHapticsEnabled(_ enabled: Bool) {
+        now = Date()
+        defaults.set(enabled, forKey: Self.hapticsEnabledKey)
+        engine.setHapticsEnabled(enabled)
         state = engine.state
         lastCountdownCue = nil
         sendState()

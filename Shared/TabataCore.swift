@@ -24,6 +24,7 @@ struct TabataState: Codable, Equatable, Sendable {
     var isRunning: Bool
     var pausedRemaining: TimeInterval?
     var soundsEnabled: Bool
+    var hapticsEnabled: Bool
 
     static func idle(config: TabataConfig = .classic) -> TabataState {
         TabataState(
@@ -34,7 +35,8 @@ struct TabataState: Codable, Equatable, Sendable {
             phaseDuration: config.workDuration,
             isRunning: false,
             pausedRemaining: config.workDuration,
-            soundsEnabled: true
+            soundsEnabled: true,
+            hapticsEnabled: true
         )
     }
 
@@ -169,6 +171,7 @@ struct TabataEngine {
         }
 
         let soundsEnabled = state.soundsEnabled
+        let hapticsEnabled = state.hapticsEnabled
         state = TabataState(
             config: state.config,
             phase: .work,
@@ -177,7 +180,8 @@ struct TabataEngine {
             phaseDuration: state.config.workDuration,
             isRunning: true,
             pausedRemaining: nil,
-            soundsEnabled: soundsEnabled
+            soundsEnabled: soundsEnabled,
+            hapticsEnabled: hapticsEnabled
         )
     }
 
@@ -213,12 +217,18 @@ struct TabataEngine {
 
     mutating func reset() {
         let soundsEnabled = state.soundsEnabled
+        let hapticsEnabled = state.hapticsEnabled
         state = .idle(config: state.config)
         state.soundsEnabled = soundsEnabled
+        state.hapticsEnabled = hapticsEnabled
     }
 
     mutating func setSoundsEnabled(_ enabled: Bool) {
         state.soundsEnabled = enabled
+    }
+
+    mutating func setHapticsEnabled(_ enabled: Bool) {
+        state.hapticsEnabled = enabled
     }
 
     mutating func tick(now: Date) -> TabataState {
@@ -274,7 +284,7 @@ struct CountdownCue: Hashable, Sendable {
 
 enum TabataCuePolicy {
     static func countdownCue(in state: TabataState, now: Date) -> CountdownCue? {
-        guard state.soundsEnabled, state.isRunning, state.isWorkoutPhase else {
+        guard (state.soundsEnabled || state.hapticsEnabled), state.isRunning, state.isWorkoutPhase else {
             return nil
         }
 
@@ -289,7 +299,7 @@ enum TabataCuePolicy {
     }
 
     static func needsTransitionCue(from oldState: TabataState, to newState: TabataState) -> Bool {
-        guard newState.soundsEnabled else {
+        guard newState.soundsEnabled || newState.hapticsEnabled else {
             return false
         }
 

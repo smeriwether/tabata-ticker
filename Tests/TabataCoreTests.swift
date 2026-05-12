@@ -144,30 +144,44 @@ final class TabataCoreTests: XCTestCase {
 
         var mutedRestState = restState
         mutedRestState.soundsEnabled = false
+        mutedRestState.hapticsEnabled = false
 
         XCTAssertFalse(TabataCuePolicy.needsTransitionCue(from: workState, to: mutedRestState))
     }
 
-    func testSoundsToggleSuppressesCues() {
+    func testCueSettingsSuppressCuesWhenBothAreOff() {
         let start = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()
 
         engine.start(now: start)
         engine.setSoundsEnabled(false)
+        engine.setHapticsEnabled(false)
 
         XCTAssertNil(TabataCuePolicy.countdownCue(in: engine.state, now: start.addingTimeInterval(15)))
         XCTAssertFalse(TabataCuePolicy.needsTransitionCue(from: engine.state, to: engine.tick(now: start.addingTimeInterval(20))))
     }
 
-    func testResetPreservesSoundsSetting() {
+    func testHapticOnlyCuesStillRun() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+
+        engine.start(now: start)
+        engine.setSoundsEnabled(false)
+
+        XCTAssertEqual(TabataCuePolicy.countdownCue(in: engine.state, now: start.addingTimeInterval(15))?.second, 5)
+    }
+
+    func testResetPreservesCueSettings() {
         let start = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()
 
         engine.setSoundsEnabled(false)
+        engine.setHapticsEnabled(false)
         engine.start(now: start)
         engine.reset()
 
         XCTAssertFalse(engine.state.soundsEnabled)
+        XCTAssertFalse(engine.state.hapticsEnabled)
         XCTAssertEqual(engine.state.phase, .idle)
     }
 

@@ -16,6 +16,10 @@ struct ContentView: View {
                         get: { viewModel.state.soundsEnabled },
                         set: { viewModel.setSoundsEnabled($0) }
                     ),
+                    hapticsEnabled: Binding(
+                        get: { viewModel.state.hapticsEnabled },
+                        set: { viewModel.setHapticsEnabled($0) }
+                    ),
                     showsReset: presentation.showsReset,
                     reset: {
                         viewModel.reset()
@@ -242,6 +246,7 @@ struct ContentView: View {
 
 private struct SettingsView: View {
     @Binding var soundsEnabled: Bool
+    @Binding var hapticsEnabled: Bool
     let showsReset: Bool
     let reset: () -> Void
     let close: () -> Void
@@ -272,6 +277,19 @@ private struct SettingsView: View {
                         .font(.headline)
 
                     Text(soundsEnabled ? "On" : "Off")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+            }
+            .tint(.green)
+            .foregroundStyle(.white)
+
+            Toggle(isOn: $hapticsEnabled) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Haptic feedback on Apple Watch")
+                        .font(.headline)
+
+                    Text(hapticsEnabled ? "On" : "Off")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.7))
                 }

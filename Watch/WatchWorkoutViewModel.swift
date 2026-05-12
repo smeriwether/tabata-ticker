@@ -10,6 +10,7 @@ final class WatchWorkoutViewModel {
     private(set) var now: Date
 
     private static let soundsEnabledKey = "soundsEnabled"
+    private static let hapticsEnabledKey = "hapticsEnabled"
 
     @ObservationIgnored
     private var engine: TabataEngine
@@ -27,6 +28,9 @@ final class WatchWorkoutViewModel {
         var initialState = TabataState.idle()
         if defaults.object(forKey: Self.soundsEnabledKey) != nil {
             initialState.soundsEnabled = defaults.bool(forKey: Self.soundsEnabledKey)
+        }
+        if defaults.object(forKey: Self.hapticsEnabledKey) != nil {
+            initialState.hapticsEnabled = defaults.bool(forKey: Self.hapticsEnabledKey)
         }
 
         state = initialState
@@ -52,12 +56,12 @@ final class WatchWorkoutViewModel {
         state = engine.tick(now: now)
 
         if TabataCuePolicy.needsTransitionCue(from: oldState, to: state) {
-            cuePerformer.playTransition()
+            cuePerformer.playTransition(soundsEnabled: state.soundsEnabled, hapticsEnabled: state.hapticsEnabled)
             lastCountdownCue = nil
         }
 
         if let cue = TabataCuePolicy.countdownCue(in: state, now: now), cue != lastCountdownCue {
-            cuePerformer.playCountdown()
+            cuePerformer.playCountdown(soundsEnabled: state.soundsEnabled, hapticsEnabled: state.hapticsEnabled)
             lastCountdownCue = cue
         }
     }
@@ -82,6 +86,7 @@ final class WatchWorkoutViewModel {
     private func receive(_ newState: TabataState) {
         now = Date()
         defaults.set(newState.soundsEnabled, forKey: Self.soundsEnabledKey)
+        defaults.set(newState.hapticsEnabled, forKey: Self.hapticsEnabledKey)
         state = newState
         engine = TabataEngine(state: newState)
         lastCountdownCue = nil
@@ -92,14 +97,22 @@ private final class WatchCuePerformer {
     private let countdownPlayer = WatchCuePerformer.makePlayer(frequency: 880, duration: 0.08)
     private let transitionPlayer = WatchCuePerformer.makePlayer(frequency: 1320, duration: 0.16)
 
-    func playCountdown() {
-        play(countdownPlayer)
-        WKInterfaceDevice.current().play(.click)
+    func playCountdown(soundsEnabled: Bool, hapticsEnabled: Bool) {
+        if soundsEnabled {
+            play(countdownPlayer)
+        }
+        if hapticsEnabled {
+            WKInterfaceDevice.current().play(.click)
+        }
     }
 
-    func playTransition() {
-        play(transitionPlayer)
-        WKInterfaceDevice.current().play(.notification)
+    func playTransition(soundsEnabled: Bool, hapticsEnabled: Bool) {
+        if soundsEnabled {
+            play(transitionPlayer)
+        }
+        if hapticsEnabled {
+            WKInterfaceDevice.current().play(.notification)
+        }
     }
 
     private static func makePlayer(frequency: Double, duration: Double) -> AVAudioPlayer? {
