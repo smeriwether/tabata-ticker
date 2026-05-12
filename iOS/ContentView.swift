@@ -51,12 +51,7 @@ struct ContentView: View {
                 hapticsEnabled: Binding(
                     get: { viewModel.state.hapticsEnabled },
                     set: { viewModel.setHapticsEnabled($0) }
-                ),
-                showsReset: presentation.showsReset,
-                reset: {
-                    viewModel.reset()
-                    isShowingSettings = false
-                }
+                )
             )
             .frame(maxWidth: contentMaxWidth)
             .padding(.horizontal, horizontalPadding)
@@ -245,8 +240,6 @@ struct ContentView: View {
 private struct SettingsView: View {
     @Binding var soundsEnabled: Bool
     @Binding var hapticsEnabled: Bool
-    let showsReset: Bool
-    let reset: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
@@ -281,18 +274,6 @@ private struct SettingsView: View {
             .foregroundStyle(.white)
 
             Spacer(minLength: 0)
-
-            if showsReset {
-                Button {
-                    reset()
-                } label: {
-                    Text("Reset Workout")
-                        .frame(maxWidth: .infinity, minHeight: 54)
-                }
-                .buttonStyle(.glass)
-                .font(.headline.weight(.bold))
-                .foregroundStyle(.white)
-            }
         }
     }
 }
