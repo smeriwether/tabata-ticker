@@ -73,6 +73,7 @@ watch_target.add_resources([asset_ref])
 
 embed_watch_phase = ios_target.new_copy_files_build_phase("Embed Watch Content")
 embed_watch_phase.symbol_dst_subfolder_spec = :products_directory
+embed_watch_phase.dst_path = "$(CONTENTS_FOLDER_PATH)/Watch"
 watch_build_file = project.new(Xcodeproj::Project::Object::PBXBuildFile)
 watch_build_file.file_ref = watch_target.product_reference
 watch_build_file.settings = { "ATTRIBUTES" => ["RemoveHeadersOnCopy"] }
