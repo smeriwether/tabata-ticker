@@ -211,19 +211,35 @@ jobs:
             exit 1
           fi
 
-          echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_ENV"
-          echo "IPA_ASSET_NAME=TabataTicker-${VERSION}-${BUILD_NUMBER}.ipa" >> "$GITHUB_ENV"
+          IPA_ASSET_NAME="TabataTicker-${VERSION}-${BUILD_NUMBER}.ipa"
+          IPA_ASSET_PATH="$EXPORT_PATH/$IPA_ASSET_NAME"
+          cp "$IPA_PATH" "$IPA_ASSET_PATH"
+
+          echo "IPA_PATH=$IPA_ASSET_PATH" >> "$GITHUB_ENV"
+          echo "IPA_ASSET_NAME=$IPA_ASSET_NAME" >> "$GITHUB_ENV"
 
       - name: Upload to App Store Connect
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
+          set +e
           xcrun altool --upload-app \
             --file "$IPA_PATH" \
             --type ios \
             --apiKey "$ASC_KEY_ID" \
-            --apiIssuer "$ASC_ISSUER_ID"
+            --apiIssuer "$ASC_ISSUER_ID" 2>&1 | tee "$RUNNER_TEMP/altool-upload.log"
+          ALTOOL_STATUS=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$ALTOOL_STATUS" -ne 0 ]; then
+            exit "$ALTOOL_STATUS"
+          fi
+
+          if grep -Eq "UPLOAD FAILED|Validation failed|Failed to upload package" "$RUNNER_TEMP/altool-upload.log"; then
+            echo "App Store Connect upload failed validation."
+            exit 1
+          fi
 
       - name: Publish GitHub Release
         env:
@@ -236,9 +252,9 @@ jobs:
           fi
 
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$IPA_PATH#$IPA_ASSET_NAME" --clobber
+            gh release upload "$TAG" "$IPA_PATH" --clobber
           else
-            gh release create "$TAG" "$IPA_PATH#$IPA_ASSET_NAME" \
+            gh release create "$TAG" "$IPA_PATH" \
               --target "$GITHUB_SHA" \
               --title "Tabata Ticker $VERSION" \
               --notes "$RELEASE_NOTES"
