@@ -27,6 +27,7 @@ env:
   EXPORT_PATH: build/export
   KEYCHAIN_NAME: build.keychain-db
   KEYCHAIN_PASSWORD: temporary-ci-password
+  APPLE_TEAM_ID: 8G4H6268W7
   IOS_BUNDLE_ID: com.merimerimeri.tabataticker
   WATCH_BUNDLE_ID: com.merimerimeri.tabataticker.watchkitapp
 
@@ -78,27 +79,29 @@ jobs:
       - name: Run Tests
         run: swift test
 
-      - name: Install Apple Certificate and Provisioning Profiles
+      - name: Install App Store Connect API Key
         env:
-          CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
-          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
-          WATCH_PROVISIONING_PROFILE_BASE64: ${{ secrets.WATCH_PROVISIONING_PROFILE_BASE64 }}
+          ASC_API_KEY_P8_BASE64: ${{ secrets.ASC_API_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
         run: |
-          CERTIFICATE_PATH="$RUNNER_TEMP/certificate.p12"
-          IOS_PROFILE_PATH="$RUNNER_TEMP/ios.mobileprovision"
-          WATCH_PROFILE_PATH="$RUNNER_TEMP/watch.mobileprovision"
+          mkdir -p ~/.private_keys
+          echo "$ASC_API_KEY_P8_BASE64" | base64 --decode -o ~/.private_keys/AuthKey_${ASC_KEY_ID}.p8
+          echo "ASC_API_KEY_PATH=$HOME/.private_keys/AuthKey_${ASC_KEY_ID}.p8" >> "$GITHUB_ENV"
 
-          echo "$CERTIFICATE_P12_BASE64" | base64 --decode -o "$CERTIFICATE_PATH"
-          echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode -o "$IOS_PROFILE_PATH"
-          echo "$WATCH_PROVISIONING_PROFILE_BASE64" | base64 --decode -o "$WATCH_PROFILE_PATH"
+      - name: Create Temporary App Store Signing Assets
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: ruby Tools/app_store_connect_signing.rb prepare
 
+      - name: Install Apple Certificate and Provisioning Profiles
+        run: |
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_NAME"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
 
-          security import "$CERTIFICATE_PATH" \
-            -P "$CERTIFICATE_PASSWORD" \
+          security import "$APPLE_CERTIFICATE_PATH" \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
             -A \
             -t cert \
             -f pkcs12 \
@@ -116,15 +119,15 @@ jobs:
           PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$PROFILES_DIR"
 
-          IOS_PROFILE_PLIST=$(security cms -D -i "$IOS_PROFILE_PATH")
+          IOS_PROFILE_PLIST=$(security cms -D -i "$IOS_PROVISIONING_PROFILE_PATH")
           IOS_PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< "$IOS_PROFILE_PLIST")
           IOS_PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< "$IOS_PROFILE_PLIST")
-          cp "$IOS_PROFILE_PATH" "$PROFILES_DIR/$IOS_PROFILE_UUID.mobileprovision"
+          cp "$IOS_PROVISIONING_PROFILE_PATH" "$PROFILES_DIR/$IOS_PROFILE_UUID.mobileprovision"
 
-          WATCH_PROFILE_PLIST=$(security cms -D -i "$WATCH_PROFILE_PATH")
+          WATCH_PROFILE_PLIST=$(security cms -D -i "$WATCH_PROVISIONING_PROFILE_PATH")
           WATCH_PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< "$WATCH_PROFILE_PLIST")
           WATCH_PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< "$WATCH_PROFILE_PLIST")
-          cp "$WATCH_PROFILE_PATH" "$PROFILES_DIR/$WATCH_PROFILE_UUID.mobileprovision"
+          cp "$WATCH_PROVISIONING_PROFILE_PATH" "$PROFILES_DIR/$WATCH_PROFILE_UUID.mobileprovision"
 
           echo "IOS_PROFILE_UUID=$IOS_PROFILE_UUID" >> "$GITHUB_ENV"
           echo "IOS_PROFILE_NAME=$IOS_PROFILE_NAME" >> "$GITHUB_ENV"
@@ -133,17 +136,7 @@ jobs:
 
           security find-identity -v -p codesigning "$KEYCHAIN_NAME"
 
-      - name: Install App Store Connect API Key
-        env:
-          ASC_API_KEY_P8_BASE64: ${{ secrets.ASC_API_KEY_P8_BASE64 }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-        run: |
-          mkdir -p ~/.private_keys
-          echo "$ASC_API_KEY_P8_BASE64" | base64 --decode -o ~/.private_keys/AuthKey_${ASC_KEY_ID}.p8
-
       - name: Create Signing Overrides
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cat > "$RUNNER_TEMP/Signing.xcconfig" <<EOF
           DEVELOPMENT_TEAM = ${APPLE_TEAM_ID}
@@ -166,8 +159,6 @@ jobs:
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
 
       - name: Generate ExportOptions.plist
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -257,11 +248,22 @@ jobs:
           path: ${{ env.IPA_PATH }}
           retention-days: 30
 
+      - name: Cleanup App Store Connect Signing Assets
+        if: always()
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: ruby Tools/app_store_connect_signing.rb cleanup
+
       - name: Cleanup
         if: always()
         run: |
           security delete-keychain "$KEYCHAIN_NAME" 2>/dev/null || true
           rm -f "$RUNNER_TEMP/certificate.p12"
+          rm -f "$RUNNER_TEMP/apple_distribution.key"
+          rm -f "$RUNNER_TEMP/apple_distribution.csr"
+          rm -f "$RUNNER_TEMP/apple_distribution.cer"
+          rm -f "$RUNNER_TEMP/apple_distribution.pem"
           rm -f "$RUNNER_TEMP/ios.mobileprovision"
           rm -f "$RUNNER_TEMP/watch.mobileprovision"
           rm -f "$RUNNER_TEMP/ExportOptions.plist"

@@ -28,24 +28,7 @@ Because this app ships with an Apple Watch companion, fill in the required watch
 
 ## Apple Developer Assets
 
-Create or reuse an Apple Distribution certificate, then create two App Store provisioning profiles:
-
-| Secret | Profile type | App ID |
-| --- | --- | --- |
-| `IOS_PROVISIONING_PROFILE_BASE64` | App Store | `com.merimerimeri.tabataticker` |
-| `WATCH_PROVISIONING_PROFILE_BASE64` | App Store | `com.merimerimeri.tabataticker.watchkitapp` |
-
-Encode profiles with:
-
-```sh
-base64 -i TabataTicker.mobileprovision | pbcopy
-```
-
-Encode the distribution certificate with:
-
-```sh
-base64 -i AppleDistribution.p12 | pbcopy
-```
+The release workflow creates temporary Apple Distribution signing assets and App Store provisioning profiles through the App Store Connect API, then cleans them up after the run.
 
 ## GitHub Secrets
 
@@ -53,16 +36,11 @@ Add these repository secrets to `smeriwether/tabata-ticker`:
 
 | Secret | Description |
 | --- | --- |
-| `APPLE_CERTIFICATE_P12_BASE64` | Base64-encoded Apple Distribution `.p12` |
-| `APPLE_CERTIFICATE_PASSWORD` | Password used when exporting the `.p12` |
-| `APPLE_TEAM_ID` | Apple Developer team ID, currently `8G4H6268W7` |
-| `IOS_PROVISIONING_PROFILE_BASE64` | Base64-encoded iOS App Store provisioning profile |
-| `WATCH_PROVISIONING_PROFILE_BASE64` | Base64-encoded watchOS App Store provisioning profile |
 | `ASC_API_KEY_P8_BASE64` | Base64-encoded App Store Connect API key `.p8` |
 | `ASC_KEY_ID` | App Store Connect API key ID |
 | `ASC_ISSUER_ID` | App Store Connect issuer ID |
 
-The App Store Connect API key should have App Manager access.
+The App Store Connect API key must be allowed to manage certificates, identifiers, profiles, and app uploads. Admin access is the least ambiguous option for this first setup.
 
 ## Release
 
