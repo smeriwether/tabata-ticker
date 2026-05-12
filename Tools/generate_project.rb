@@ -7,6 +7,7 @@ APP_DISPLAY_NAME = "Tabata Ticker"
 APPLE_TEAM_ID = "8G4H6268W7"
 BUNDLE_ID = "com.merimerimeri.tabataticker"
 WATCH_BUNDLE_ID = "#{BUNDLE_ID}.watchkitapp"
+LIVE_ACTIVITY_BUNDLE_ID = "#{BUNDLE_ID}.liveactivity"
 
 FileUtils.rm_rf(PROJECT_PATH)
 
@@ -14,8 +15,10 @@ project = Xcodeproj::Project.new(PROJECT_PATH)
 
 ios_target = project.new_target(:application, "Tabata", :ios, "26.0")
 watch_target = project.new_target(:application, "Tabata Watch App", :watchos, "26.0")
+live_activity_target = project.new_target(:app_extension, "Tabata Live Activity", :ios, "26.0")
 test_target = project.new_target(:unit_test_bundle, "TabataTests", :osx, "26.0")
 ios_target.add_dependency(watch_target)
+ios_target.add_dependency(live_activity_target)
 
 def add_sources(project, target, paths)
   paths.each do |path|
@@ -43,7 +46,9 @@ ios_sources = shared_sources + [
   "iOS/TabataApp.swift",
   "iOS/ContentView.swift",
   "iOS/WorkoutViewModel.swift",
-  "iOS/PhoneConnectivity.swift"
+  "iOS/PhoneConnectivity.swift",
+  "iOS/TabataLiveActivityController.swift",
+  "LiveActivity/TabataLiveActivityAttributes.swift"
 ]
 
 watch_sources = shared_sources + [
@@ -53,12 +58,18 @@ watch_sources = shared_sources + [
   "Watch/WatchConnectivity.swift"
 ]
 
+live_activity_sources = [
+  "LiveActivity/TabataLiveActivityAttributes.swift",
+  "LiveActivity/TabataLiveActivityWidget.swift"
+]
+
 test_sources = [
   "Tests/TabataCoreTests.swift"
 ]
 
 add_sources(project, ios_target, ios_sources)
 add_sources(project, watch_target, watch_sources)
+add_sources(project, live_activity_target, live_activity_sources)
 add_sources(project, test_target, test_sources)
 
 package_ref = project.new(Xcodeproj::Project::Object::XCLocalSwiftPackageReference)
@@ -79,6 +90,13 @@ watch_build_file.file_ref = watch_target.product_reference
 watch_build_file.settings = { "ATTRIBUTES" => ["RemoveHeadersOnCopy"] }
 embed_watch_phase.files << watch_build_file
 
+embed_extension_phase = ios_target.new_copy_files_build_phase("Embed App Extensions")
+embed_extension_phase.symbol_dst_subfolder_spec = :plug_ins
+live_activity_build_file = project.new(Xcodeproj::Project::Object::PBXBuildFile)
+live_activity_build_file.file_ref = live_activity_target.product_reference
+live_activity_build_file.settings = { "ATTRIBUTES" => ["RemoveHeadersOnCopy"] }
+embed_extension_phase.files << live_activity_build_file
+
 def configure_common(target)
   target.build_configurations.each do |config|
     settings = config.build_settings
@@ -94,7 +112,7 @@ def configure_common(target)
   end
 end
 
-[ios_target, watch_target, test_target].each { |target| configure_common(target) }
+[ios_target, watch_target, live_activity_target, test_target].each { |target| configure_common(target) }
 
 ios_target.build_configurations.each do |config|
   settings = config.build_settings
@@ -133,6 +151,24 @@ watch_target.build_configurations.each do |config|
   settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
   settings["INFOPLIST_KEY_WKCompanionAppBundleIdentifier"] = BUNDLE_ID
   settings["SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
+end
+
+live_activity_target.build_configurations.each do |config|
+  settings = config.build_settings
+  settings["APPLICATION_EXTENSION_API_ONLY"] = "YES"
+  settings["GENERATE_INFOPLIST_FILE"] = "NO"
+  settings["INFOPLIST_FILE"] = "LiveActivity/Info.plist"
+  settings["PRODUCT_BUNDLE_IDENTIFIER"] = LIVE_ACTIVITY_BUNDLE_ID
+  settings["IPHONEOS_DEPLOYMENT_TARGET"] = "26.0"
+  settings["SDKROOT"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
+  settings["SKIP_INSTALL"] = "YES"
+  settings["SUPPORTED_PLATFORMS"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
+  settings["TARGETED_DEVICE_FAMILY"] = "1,2"
+  if config.name == "Release"
+    settings["CODE_SIGN_STYLE"] = "Manual"
+    settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
+    settings["PROVISIONING_PROFILE_SPECIFIER"] = "$(LIVE_ACTIVITY_PROFILE_NAME)"
+  end
 end
 
 test_target.build_configurations.each do |config|

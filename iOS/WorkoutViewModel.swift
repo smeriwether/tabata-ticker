@@ -17,6 +17,7 @@ final class WorkoutViewModel {
     private let defaults: UserDefaults
     private let connectivity = PhoneConnectivity()
     private let cuePerformer = PhoneCuePerformer()
+    private let liveActivityController = TabataLiveActivityController()
     @ObservationIgnored
     private var lastCountdownCue: CountdownCue?
     @ObservationIgnored
@@ -49,6 +50,7 @@ final class WorkoutViewModel {
         }
         connectivity.activate()
         sendState()
+        syncLiveActivity()
     }
 
     func tick(now: Date = Date()) {
@@ -69,6 +71,7 @@ final class WorkoutViewModel {
 
         if oldState != state {
             sendState()
+            syncLiveActivity()
         }
     }
 
@@ -79,6 +82,7 @@ final class WorkoutViewModel {
         state = engine.state
         updateIdleTimer()
         sendState()
+        syncLiveActivity()
     }
 
     func reset() {
@@ -88,6 +92,7 @@ final class WorkoutViewModel {
         lastCountdownCue = nil
         updateIdleTimer()
         sendState()
+        syncLiveActivity()
     }
 
     func setSoundsEnabled(_ enabled: Bool) {
@@ -121,6 +126,10 @@ final class WorkoutViewModel {
 
     private func sendState() {
         connectivity.send(state)
+    }
+
+    private func syncLiveActivity() {
+        liveActivityController.sync(state: state, now: now)
     }
 
     private func updateIdleTimer() {

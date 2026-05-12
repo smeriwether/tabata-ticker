@@ -65,6 +65,7 @@ struct WatchContentView: View {
                     .frame(maxWidth: .infinity, minHeight: 32)
             }
             .buttonStyle(.glassProminent)
+            .foregroundStyle(.black)
         } else {
             Button {
                 primaryAction()

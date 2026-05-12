@@ -30,6 +30,7 @@ env:
   APPLE_TEAM_ID: 8G4H6268W7
   IOS_BUNDLE_ID: com.merimerimeri.tabataticker
   WATCH_BUNDLE_ID: com.merimerimeri.tabataticker.watchkitapp
+  LIVE_ACTIVITY_BUNDLE_ID: com.merimerimeri.tabataticker.liveactivity
 
 jobs:
   release:
@@ -140,10 +141,17 @@ jobs:
           WATCH_PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< "$WATCH_PROFILE_PLIST")
           cp "$WATCH_PROVISIONING_PROFILE_PATH" "$PROFILES_DIR/$WATCH_PROFILE_UUID.mobileprovision"
 
+          LIVE_ACTIVITY_PROFILE_PLIST=$(security cms -D -i "$LIVE_ACTIVITY_PROVISIONING_PROFILE_PATH")
+          LIVE_ACTIVITY_PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< "$LIVE_ACTIVITY_PROFILE_PLIST")
+          LIVE_ACTIVITY_PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< "$LIVE_ACTIVITY_PROFILE_PLIST")
+          cp "$LIVE_ACTIVITY_PROVISIONING_PROFILE_PATH" "$PROFILES_DIR/$LIVE_ACTIVITY_PROFILE_UUID.mobileprovision"
+
           echo "IOS_PROFILE_UUID=$IOS_PROFILE_UUID" >> "$GITHUB_ENV"
           echo "IOS_PROFILE_NAME=$IOS_PROFILE_NAME" >> "$GITHUB_ENV"
           echo "WATCH_PROFILE_UUID=$WATCH_PROFILE_UUID" >> "$GITHUB_ENV"
           echo "WATCH_PROFILE_NAME=$WATCH_PROFILE_NAME" >> "$GITHUB_ENV"
+          echo "LIVE_ACTIVITY_PROFILE_UUID=$LIVE_ACTIVITY_PROFILE_UUID" >> "$GITHUB_ENV"
+          echo "LIVE_ACTIVITY_PROFILE_NAME=$LIVE_ACTIVITY_PROFILE_NAME" >> "$GITHUB_ENV"
 
           security find-identity -v -p codesigning "$KEYCHAIN_NAME"
 
@@ -192,6 +200,8 @@ jobs:
               <string>${IOS_PROFILE_NAME}</string>
               <key>${WATCH_BUNDLE_ID}</key>
               <string>${WATCH_PROFILE_NAME}</string>
+              <key>${LIVE_ACTIVITY_BUNDLE_ID}</key>
+              <string>${LIVE_ACTIVITY_PROFILE_NAME}</string>
             </dict>
           </dict>
           </plist>
@@ -299,6 +309,7 @@ jobs:
           rm -f "$RUNNER_TEMP/apple_distribution.pem"
           rm -f "$RUNNER_TEMP/ios.mobileprovision"
           rm -f "$RUNNER_TEMP/watch.mobileprovision"
+          rm -f "$RUNNER_TEMP/live_activity.mobileprovision"
           rm -f "$RUNNER_TEMP/ExportOptions.plist"
           rm -rf ~/.private_keys
           if [ -n "${IOS_PROFILE_UUID:-}" ]; then
@@ -306,4 +317,7 @@ jobs:
           fi
           if [ -n "${WATCH_PROFILE_UUID:-}" ]; then
             rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/$WATCH_PROFILE_UUID.mobileprovision"
+          fi
+          if [ -n "${LIVE_ACTIVITY_PROFILE_UUID:-}" ]; then
+            rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/$LIVE_ACTIVITY_PROFILE_UUID.mobileprovision"
           fi

@@ -10,6 +10,7 @@ Register these explicit App IDs in the Apple Developer portal:
 | --- | --- |
 | iOS app | `com.merimerimeri.tabataticker` |
 | Watch companion | `com.merimerimeri.tabataticker.watchkitapp` |
+| Live Activity extension | `com.merimerimeri.tabataticker.liveactivity` |
 
 The Xcode project generator sets the Apple team to `8G4H6268W7`, matching the existing MenuMines signing setup.
 

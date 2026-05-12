@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0DB74E0820E84AAF29A72A08"
+               BlueprintIdentifier = "B671C7DC23E16DCAC950B185"
                BuildableName = "Tabata.app"
                BlueprintName = "Tabata"
                ReferencedContainer = "container:Tabata.xcodeproj">
@@ -30,7 +30,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0DB74E0820E84AAF29A72A08"
+            BlueprintIdentifier = "B671C7DC23E16DCAC950B185"
             BuildableName = "Tabata.app"
             BlueprintName = "Tabata"
             ReferencedContainer = "container:Tabata.xcodeproj">
@@ -53,7 +53,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0DB74E0820E84AAF29A72A08"
+            BlueprintIdentifier = "B671C7DC23E16DCAC950B185"
             BuildableName = "Tabata.app"
             BlueprintName = "Tabata"
             ReferencedContainer = "container:Tabata.xcodeproj">
@@ -70,7 +70,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0DB74E0820E84AAF29A72A08"
+            BlueprintIdentifier = "B671C7DC23E16DCAC950B185"
             BuildableName = "Tabata.app"
             BlueprintName = "Tabata"
             ReferencedContainer = "container:Tabata.xcodeproj">

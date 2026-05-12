@@ -6,41 +6,11 @@ struct ContentView: View {
     @State private var isShowingSettings = false
 
     var body: some View {
-        ZStack {
-            LinearGradient(colors: backgroundColors, startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
+        NavigationStack {
+            ZStack {
+                LinearGradient(colors: backgroundColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .ignoresSafeArea()
 
-            if isShowingSettings {
-                SettingsView(
-                    soundsEnabled: Binding(
-                        get: { viewModel.state.soundsEnabled },
-                        set: { viewModel.setSoundsEnabled($0) }
-                    ),
-                    hapticsEnabled: Binding(
-                        get: { viewModel.state.hapticsEnabled },
-                        set: { viewModel.setHapticsEnabled($0) }
-                    ),
-                    showsReset: presentation.showsReset,
-                    reset: {
-                        viewModel.reset()
-                        withAnimation(.smooth(duration: 0.28)) {
-                            isShowingSettings = false
-                        }
-                    },
-                    close: {
-                        withAnimation(.smooth(duration: 0.28)) {
-                            isShowingSettings = false
-                        }
-                    }
-                )
-                .frame(maxWidth: contentMaxWidth)
-                .padding(.horizontal, horizontalPadding)
-                .padding(.vertical, verticalPadding)
-                .transition(.asymmetric(
-                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                    removal: .move(edge: .trailing).combined(with: .opacity)
-                ))
-            } else {
                 VStack(spacing: verticalSpacing) {
                     header
 
@@ -53,19 +23,46 @@ struct ContentView: View {
                 .frame(maxWidth: contentMaxWidth)
                 .padding(.horizontal, horizontalPadding)
                 .padding(.vertical, verticalPadding)
-                .transition(.asymmetric(
-                    insertion: .move(edge: .leading).combined(with: .opacity),
-                    removal: .move(edge: .leading).combined(with: .opacity)
-                ))
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .navigationDestination(isPresented: $isShowingSettings) {
+                settingsScreen
             }
         }
-        .animation(.smooth(duration: 0.28), value: isShowingSettings)
+        .tint(.white.opacity(0.86))
         .onAppear {
             viewModel.activate()
         }
         .task(id: viewModel.state.isRunning) {
             await tickWhileRunning()
         }
+    }
+
+    private var settingsScreen: some View {
+        ZStack {
+            LinearGradient(colors: backgroundColors, startPoint: .topLeading, endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+
+            SettingsView(
+                soundsEnabled: Binding(
+                    get: { viewModel.state.soundsEnabled },
+                    set: { viewModel.setSoundsEnabled($0) }
+                ),
+                hapticsEnabled: Binding(
+                    get: { viewModel.state.hapticsEnabled },
+                    set: { viewModel.setHapticsEnabled($0) }
+                ),
+                showsReset: presentation.showsReset,
+                reset: {
+                    viewModel.reset()
+                    isShowingSettings = false
+                }
+            )
+            .frame(maxWidth: contentMaxWidth)
+            .padding(.horizontal, horizontalPadding)
+            .padding(.vertical, verticalPadding)
+        }
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
 
     private var header: some View {
@@ -138,6 +135,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity, minHeight: primaryButtonHeight)
             }
             .buttonStyle(.glassProminent)
+            .foregroundStyle(.black)
         } else {
             Button {
                 primaryAction()
@@ -249,24 +247,9 @@ private struct SettingsView: View {
     @Binding var hapticsEnabled: Bool
     let showsReset: Bool
     let reset: () -> Void
-    let close: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
-            HStack {
-                Button(action: close) {
-                    Image(systemName: "chevron.left")
-                        .font(.headline.weight(.bold))
-                        .frame(width: 34, height: 34)
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.white.opacity(0.86))
-                .accessibilityLabel("Back")
-
-                Spacer()
-            }
-
             Text("Settings")
                 .font(.system(size: 44, weight: .black, design: .rounded))
                 .foregroundStyle(.white)

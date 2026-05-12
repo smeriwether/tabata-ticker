@@ -231,6 +231,7 @@ def prepare
   run_id = env_fetch("GITHUB_RUN_ID")
   ios_bundle_identifier = env_fetch("IOS_BUNDLE_ID")
   watch_bundle_identifier = env_fetch("WATCH_BUNDLE_ID")
+  live_activity_bundle_identifier = env_fetch("LIVE_ACTIVITY_BUNDLE_ID")
 
   FileUtils.mkdir_p(temp_dir)
 
@@ -243,6 +244,11 @@ def prepare
     client,
     identifier: watch_bundle_identifier,
     name: "Tabata Ticker Watch App"
+  )
+  live_activity_bundle_id = find_or_create_bundle_id(
+    client,
+    identifier: live_activity_bundle_identifier,
+    name: "Tabata Ticker Live Activity"
   )
 
   certificate = create_distribution_certificate(client, temp_dir)
@@ -260,14 +266,22 @@ def prepare
     certificate_id: certificate.fetch(:id),
     output_path: File.join(temp_dir, "watch.mobileprovision")
   )
+  live_activity_profile = create_profile(
+    client,
+    name: "Tabata Ticker CI Live Activity #{run_id}",
+    bundle_id: live_activity_bundle_id,
+    certificate_id: certificate.fetch(:id),
+    output_path: File.join(temp_dir, "live_activity.mobileprovision")
+  )
 
   append_env(
     "APPLE_CERTIFICATE_PATH" => certificate.fetch(:p12_path),
     "APPLE_CERTIFICATE_PASSWORD" => env_fetch("KEYCHAIN_PASSWORD"),
     "IOS_PROVISIONING_PROFILE_PATH" => File.join(temp_dir, "ios.mobileprovision"),
     "WATCH_PROVISIONING_PROFILE_PATH" => File.join(temp_dir, "watch.mobileprovision"),
+    "LIVE_ACTIVITY_PROVISIONING_PROFILE_PATH" => File.join(temp_dir, "live_activity.mobileprovision"),
     "ASC_CREATED_CERTIFICATE_ID" => certificate.fetch(:id),
-    "ASC_CREATED_PROFILE_IDS" => [ios_profile.fetch(:id), watch_profile.fetch(:id)].join(",")
+    "ASC_CREATED_PROFILE_IDS" => [ios_profile.fetch(:id), watch_profile.fetch(:id), live_activity_profile.fetch(:id)].join(",")
   )
 end
 

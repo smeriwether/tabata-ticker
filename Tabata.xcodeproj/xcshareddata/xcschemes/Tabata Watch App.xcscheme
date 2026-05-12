@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B2FF5C329E3165D93D011850"
+               BlueprintIdentifier = "DAEA833D325FF5196949860B"
                BuildableName = "Tabata Watch App.app"
                BlueprintName = "Tabata Watch App"
                ReferencedContainer = "container:Tabata.xcodeproj">
@@ -30,7 +30,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B2FF5C329E3165D93D011850"
+            BlueprintIdentifier = "DAEA833D325FF5196949860B"
             BuildableName = "Tabata Watch App.app"
             BlueprintName = "Tabata Watch App"
             ReferencedContainer = "container:Tabata.xcodeproj">
@@ -53,7 +53,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B2FF5C329E3165D93D011850"
+            BlueprintIdentifier = "DAEA833D325FF5196949860B"
             BuildableName = "Tabata Watch App.app"
             BlueprintName = "Tabata Watch App"
             ReferencedContainer = "container:Tabata.xcodeproj">
@@ -70,7 +70,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B2FF5C329E3165D93D011850"
+            BlueprintIdentifier = "DAEA833D325FF5196949860B"
             BuildableName = "Tabata Watch App.app"
             BlueprintName = "Tabata Watch App"
             ReferencedContainer = "container:Tabata.xcodeproj">
