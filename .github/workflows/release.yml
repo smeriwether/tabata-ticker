@@ -35,7 +35,7 @@ jobs:
   release:
     name: Archive, Upload, and Publish
     runs-on: macos-26
-    timeout-minutes: 45
+    timeout-minutes: 90
     if: ${{ !contains(github.ref_name, '-direct') }}
 
     steps:
@@ -56,6 +56,13 @@ jobs:
             26.*) ;;
             *) echo "Expected Xcode 26.x, found $XCODE_VERSION"; exit 1 ;;
           esac
+
+      - name: Ensure Device Platforms
+        run: |
+          xcodebuild -showsdks
+          xcodebuild -downloadPlatform iOS -architectureVariant universal
+          xcodebuild -downloadPlatform watchOS -architectureVariant universal
+          xcodebuild -showsdks
 
       - name: Compute Version
         env:
