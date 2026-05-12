@@ -155,11 +155,6 @@ jobs:
             -configuration "$CONFIGURATION" \
             -destination 'generic/platform=iOS' \
             -archivePath "$ARCHIVE_PATH" \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-            IOS_PROFILE_NAME="$IOS_PROFILE_NAME" \
-            WATCH_PROFILE_NAME="$WATCH_PROFILE_NAME" \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
 
