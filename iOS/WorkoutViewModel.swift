@@ -59,6 +59,10 @@ final class WorkoutViewModel {
         presetCatalog.canCreatePreset
     }
 
+    var canManageCustomPresets: Bool {
+        !state.isWorkoutPhase
+    }
+
     func activate() {
         guard !didActivate else {
             return
@@ -140,7 +144,7 @@ final class WorkoutViewModel {
 
     @discardableResult
     func createPreset(config: TabataConfig) -> Bool {
-        guard presetCatalog.addUserPreset(config: config) != nil else {
+        guard canManageCustomPresets, presetCatalog.addUserPreset(config: config) != nil else {
             return false
         }
 
@@ -152,7 +156,7 @@ final class WorkoutViewModel {
     @discardableResult
     func updatePreset(id: String, config: TabataConfig) -> Bool {
         let wasSelected = presetCatalog.selectedID == id
-        guard presetCatalog.updateUserPreset(id: id, config: config) else {
+        guard canManageCustomPresets, presetCatalog.updateUserPreset(id: id, config: config) else {
             return false
         }
 
@@ -166,7 +170,7 @@ final class WorkoutViewModel {
     @discardableResult
     func deletePreset(id: String) -> Bool {
         let wasSelected = presetCatalog.selectedID == id
-        guard presetCatalog.deleteUserPreset(id: id) else {
+        guard canManageCustomPresets, presetCatalog.deleteUserPreset(id: id) else {
             return false
         }
 

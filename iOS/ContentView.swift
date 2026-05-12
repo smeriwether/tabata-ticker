@@ -100,6 +100,7 @@ struct ContentView: View {
                     set: { viewModel.setHapticsEnabled($0) }
                 ),
                 presets: viewModel.presets,
+                canManageCustomPresets: viewModel.canManageCustomPresets,
                 onEditPreset: { preset in
                     path.append(.editPreset(preset.id))
                 },
@@ -417,6 +418,7 @@ private struct SettingsView: View {
     @Binding var soundsEnabled: Bool
     @Binding var hapticsEnabled: Bool
     let presets: [TabataPreset]
+    let canManageCustomPresets: Bool
     let onEditPreset: (TabataPreset) -> Void
     let onDeletePreset: (TabataPreset) -> Void
 
@@ -455,6 +457,7 @@ private struct SettingsView: View {
 
                 PresetSettingsSection(
                     presets: presets,
+                    canManageCustomPresets: canManageCustomPresets,
                     onEditPreset: onEditPreset,
                     onDeletePreset: onDeletePreset
                 )
@@ -466,6 +469,7 @@ private struct SettingsView: View {
 
 private struct PresetSettingsSection: View {
     let presets: [TabataPreset]
+    let canManageCustomPresets: Bool
     let onEditPreset: (TabataPreset) -> Void
     let onDeletePreset: (TabataPreset) -> Void
 
@@ -486,6 +490,7 @@ private struct PresetSettingsSection: View {
                 ForEach(Array(presets.enumerated()), id: \.element.id) { index, preset in
                     PresetSettingsRow(
                         preset: preset,
+                        canManageCustomPresets: canManageCustomPresets,
                         onEdit: {
                             onEditPreset(preset)
                         },
@@ -513,6 +518,7 @@ private struct PresetSettingsSection: View {
 
 private struct PresetSettingsRow: View {
     let preset: TabataPreset
+    let canManageCustomPresets: Bool
     let onEdit: () -> Void
     let onDelete: () -> Void
 
@@ -538,7 +544,7 @@ private struct PresetSettingsRow: View {
                     .foregroundStyle(.white.opacity(0.7))
                     .frame(width: 44, height: 44)
                     .accessibilityLabel("Default preset")
-            } else {
+            } else if canManageCustomPresets {
                 HStack(spacing: 8) {
                     Button(action: onEdit) {
                         Image(systemName: "pencil")
@@ -566,6 +572,12 @@ private struct PresetSettingsRow: View {
                         Text("\(preset.name) will be removed permanently.")
                     }
                 }
+            } else {
+                Image(systemName: "lock.fill")
+                    .font(.headline)
+                    .foregroundStyle(.white.opacity(0.7))
+                    .frame(width: 44, height: 44)
+                    .accessibilityLabel("Preset changes unavailable during workout")
             }
         }
         .foregroundStyle(.white)
