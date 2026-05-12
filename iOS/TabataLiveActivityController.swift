@@ -69,7 +69,7 @@ private extension TabataLiveActivityAttributes.ContentState {
         let tint = presentation.background.start
 
         title = presentation.title
-        roundText = presentation.phoneRoundText
+        roundText = "\(state.round)/\(state.config.rounds)"
         symbol = Self.symbol(for: state)
         isRunning = state.isRunning
         startsAt = state.phaseStartedAt ?? now
