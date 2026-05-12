@@ -236,11 +236,11 @@ struct ContentView: View {
     }
 
     private var settingsButtonSize: CGFloat {
-        horizontalSizeClass == .regular ? 52 : 34
+        horizontalSizeClass == .regular ? 52 : 44
     }
 
     private var settingsButtonFont: Font {
-        horizontalSizeClass == .regular ? .title2.weight(.semibold) : .headline.weight(.semibold)
+        horizontalSizeClass == .regular ? .title2.weight(.semibold) : .title3.weight(.semibold)
     }
 }
 
