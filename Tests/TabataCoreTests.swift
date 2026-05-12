@@ -111,30 +111,6 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertEqual(state.remaining(at: start.addingTimeInterval(65)), 15)
     }
 
-    func testWorkoutRemainingIncludesFutureRounds() {
-        let start = Date(timeIntervalSince1970: 100)
-        var engine = TabataEngine()
-
-        engine.start(now: start)
-
-        XCTAssertEqual(engine.state.workoutRemaining(at: start), 240)
-        XCTAssertEqual(engine.state.workoutRemaining(at: start.addingTimeInterval(5)), 235)
-
-        let restState = engine.tick(now: start.addingTimeInterval(20))
-
-        XCTAssertEqual(restState.workoutRemaining(at: start.addingTimeInterval(20)), 220)
-    }
-
-    func testWorkoutRemainingUsesPausedRemaining() {
-        let start = Date(timeIntervalSince1970: 100)
-        var engine = TabataEngine()
-
-        engine.start(now: start)
-        engine.pause(now: start.addingTimeInterval(8))
-
-        XCTAssertEqual(engine.state.workoutRemaining(at: start.addingTimeInterval(12)), 232)
-    }
-
     func testCountdownCuePolicy() {
         let start = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()

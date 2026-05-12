@@ -56,23 +56,6 @@ struct TabataState: Codable, Equatable, Sendable {
         return max(0, phaseDuration - now.timeIntervalSince(phaseStartedAt))
     }
 
-    func workoutRemaining(at now: Date) -> TimeInterval {
-        guard isWorkoutPhase else {
-            return 0
-        }
-
-        let remainingRounds = max(0, config.rounds - round)
-        let futureRoundDuration = TimeInterval(remainingRounds) * (config.workDuration + config.restDuration)
-
-        switch phase {
-        case .work:
-            return remaining(at: now) + config.restDuration + futureRoundDuration
-        case .rest:
-            return remaining(at: now) + futureRoundDuration
-        case .idle, .complete:
-            return 0
-        }
-    }
 }
 
 struct TabataColor: Equatable, Sendable {

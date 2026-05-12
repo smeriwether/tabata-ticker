@@ -11,24 +11,38 @@ struct TabataLiveActivityWidget: Widget {
                 .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {
-                DynamicIslandExpandedRegion(.leading) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(context.state.title)
-                            .font(.caption.weight(.black))
-                        Text(context.state.roundText)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                DynamicIslandExpandedRegion(.trailing) {
-                    timerText(for: context.state)
-                        .font(.title2.monospacedDigit().weight(.black))
-                }
-
                 DynamicIslandExpandedRegion(.bottom) {
-                    ProgressView(timerInterval: context.state.timerInterval, countsDown: true)
+                    VStack(spacing: 6) {
+                        HStack(spacing: 8) {
+                            Text(context.state.title)
+                                .font(.caption.weight(.black))
+                                .foregroundStyle(context.state.tint)
+                                .lineLimit(1)
+
+                            Text(context.state.roundText)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.82)
+
+                            Spacer(minLength: 8)
+                        }
+
+                        timerText(for: context.state)
+                            .font(.system(size: 34, weight: .black, design: .rounded).monospacedDigit())
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, alignment: .center)
+
+                        ProgressView(timerInterval: context.state.timerInterval, countsDown: true) {
+                            EmptyView()
+                        } currentValueLabel: {
+                            EmptyView()
+                        }
+                        .progressViewStyle(.linear)
+                        .frame(height: 4)
                         .tint(context.state.tint)
+                    }
+                    .padding(.top, 12)
                 }
             } compactLeading: {
                 Text(context.state.symbol)
@@ -43,6 +57,8 @@ struct TabataLiveActivityWidget: Widget {
                     .foregroundStyle(context.state.tint)
             }
             .keylineTint(context.state.tint)
+            .contentMargins(.horizontal, 18, for: .expanded)
+            .contentMargins(.vertical, 10, for: .expanded)
         }
     }
 

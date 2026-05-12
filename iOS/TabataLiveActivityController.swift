@@ -65,16 +65,16 @@ final class TabataLiveActivityController {
 private extension TabataLiveActivityAttributes.ContentState {
     init(state: TabataState, now: Date) {
         let presentation = TabataPresentation(state: state)
-        let workoutRemaining = Int(ceil(state.workoutRemaining(at: now)))
+        let phaseRemaining = Int(ceil(state.remaining(at: now)))
         let tint = presentation.background.start
 
         title = presentation.title
         roundText = presentation.phoneRoundText
         symbol = Self.symbol(for: state)
         isRunning = state.isRunning
-        updatedAt = now
-        endsAt = now.addingTimeInterval(TimeInterval(workoutRemaining))
-        remainingSeconds = workoutRemaining
+        startsAt = state.phaseStartedAt ?? now
+        endsAt = now.addingTimeInterval(TimeInterval(phaseRemaining))
+        remainingSeconds = phaseRemaining
         tintRed = tint.red
         tintGreen = tint.green
         tintBlue = tint.blue

@@ -7,7 +7,7 @@ struct TabataLiveActivityAttributes: ActivityAttributes {
         var roundText: String
         var symbol: String
         var isRunning: Bool
-        var updatedAt: Date
+        var startsAt: Date
         var endsAt: Date
         var remainingSeconds: Int
         var tintRed: Double
@@ -20,7 +20,7 @@ struct TabataLiveActivityAttributes: ActivityAttributes {
 
 extension TabataLiveActivityAttributes.ContentState {
     var timerInterval: ClosedRange<Date> {
-        updatedAt...max(updatedAt, endsAt)
+        startsAt...max(startsAt, endsAt)
     }
 
     var remainingText: String {
