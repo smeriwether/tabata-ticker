@@ -101,6 +101,7 @@ ios_target.build_configurations.each do |config|
   settings["PRODUCT_BUNDLE_IDENTIFIER"] = BUNDLE_ID
   settings["IPHONEOS_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
+  settings["SUPPORTED_PLATFORMS"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
   settings["TARGETED_DEVICE_FAMILY"] = "1,2"
   if config.name == "Release"
     settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
@@ -124,6 +125,7 @@ watch_target.build_configurations.each do |config|
   settings["PRODUCT_BUNDLE_IDENTIFIER"] = WATCH_BUNDLE_ID
   settings["WATCHOS_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = config.name == "Debug" ? "watchsimulator" : "watchos"
+  settings["SUPPORTED_PLATFORMS"] = config.name == "Debug" ? "watchsimulator" : "watchos"
   settings["TARGETED_DEVICE_FAMILY"] = "4"
   settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
   settings["INFOPLIST_KEY_WKCompanionAppBundleIdentifier"] = BUNDLE_ID

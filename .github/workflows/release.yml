@@ -147,13 +147,24 @@ jobs:
 
           security find-identity -v -p codesigning "$KEYCHAIN_NAME"
 
+      - name: Show Archive Destinations
+        run: |
+          xcodebuild -showdestinations \
+            -project Tabata.xcodeproj \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -sdk iphoneos \
+            -destination 'platform=iOS,name=Any iOS Device' \
+            archive
+
       - name: Archive
         run: |
           xcodebuild clean archive \
             -project Tabata.xcodeproj \
             -scheme "$SCHEME" \
             -configuration "$CONFIGURATION" \
-            -destination 'generic/platform=iOS' \
+            -sdk iphoneos \
+            -destination 'platform=iOS,name=Any iOS Device' \
             -archivePath "$ARCHIVE_PATH" \
             MARKETING_VERSION="$VERSION" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
