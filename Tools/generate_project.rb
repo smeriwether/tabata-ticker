@@ -3,7 +3,10 @@ require "xcodeproj"
 
 ROOT = File.expand_path("..", __dir__)
 PROJECT_PATH = File.join(ROOT, "Tabata.xcodeproj")
-BUNDLE_ID = "com.merimerimeri.Tabata"
+APP_DISPLAY_NAME = "Tabata Ticker"
+APPLE_TEAM_ID = "8G4H6268W7"
+BUNDLE_ID = "com.merimerimeri.tabataticker"
+WATCH_BUNDLE_ID = "#{BUNDLE_ID}.watchkitapp"
 
 FileUtils.rm_rf(PROJECT_PATH)
 
@@ -65,12 +68,20 @@ add_package_product(project, test_target, package_ref, "TabataCore")
 asset_ref = project.new_file("Assets.xcassets")
 legacy_icon_refs = Dir["Resources/*.png"].sort.map { |path| project.new_file(path) }
 ios_target.add_resources([asset_ref] + legacy_icon_refs)
+watch_target.add_resources([asset_ref])
+
+embed_watch_phase = ios_target.new_copy_files_build_phase("Embed Watch Content")
+embed_watch_phase.symbol_dst_subfolder_spec = :products_directory
+watch_build_file = project.new(Xcodeproj::Project::Object::PBXBuildFile)
+watch_build_file.file_ref = watch_target.product_reference
+watch_build_file.settings = { "ATTRIBUTES" => ["RemoveHeadersOnCopy"] }
+embed_watch_phase.files << watch_build_file
 
 def configure_common(target)
   target.build_configurations.each do |config|
     settings = config.build_settings
     settings["CODE_SIGN_STYLE"] = "Automatic"
-    settings["DEVELOPMENT_TEAM"] = ""
+    settings["DEVELOPMENT_TEAM"] = APPLE_TEAM_ID
     settings["GENERATE_INFOPLIST_FILE"] = "YES"
     settings["MARKETING_VERSION"] = "1.0"
     settings["CURRENT_PROJECT_VERSION"] = "1"
@@ -92,17 +103,19 @@ ios_target.build_configurations.each do |config|
   settings["SDKROOT"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
   settings["TARGETED_DEVICE_FAMILY"] = "1,2"
   settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon" if config.name == "Release"
+  settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
   settings["SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
   settings["SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
 end
 
 watch_target.build_configurations.each do |config|
   settings = config.build_settings
-  settings["PRODUCT_BUNDLE_IDENTIFIER"] = "#{BUNDLE_ID}.watchkitapp"
+  settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon" if config.name == "Release"
+  settings["PRODUCT_BUNDLE_IDENTIFIER"] = WATCH_BUNDLE_ID
   settings["WATCHOS_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = config.name == "Debug" ? "watchsimulator" : "watchos"
   settings["TARGETED_DEVICE_FAMILY"] = "4"
-  settings["INFOPLIST_KEY_CFBundleDisplayName"] = "Tabata Ticker"
+  settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
   settings["INFOPLIST_KEY_WKCompanionAppBundleIdentifier"] = BUNDLE_ID
   settings["SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
 end

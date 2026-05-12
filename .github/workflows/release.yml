@@ -1,0 +1,275 @@
+name: Release to TestFlight
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (for example, 1.0.0)'
+        required: true
+      release_notes:
+        description: 'GitHub release notes'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SCHEME: Tabata
+  CONFIGURATION: Release
+  ARCHIVE_PATH: build/Tabata.xcarchive
+  EXPORT_PATH: build/export
+  KEYCHAIN_NAME: build.keychain-db
+  KEYCHAIN_PASSWORD: temporary-ci-password
+  IOS_BUNDLE_ID: com.merimerimeri.tabataticker
+  WATCH_BUNDLE_ID: com.merimerimeri.tabataticker.watchkitapp
+
+jobs:
+  release:
+    name: Archive, Upload, and Publish
+    runs-on: macos-26
+    timeout-minutes: 45
+    if: ${{ !contains(github.ref_name, '-direct') }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Show Build Environment
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Verify Xcode 26
+        run: |
+          XCODE_VERSION=$(xcodebuild -version | awk '/Xcode/ { print $2 }')
+          case "$XCODE_VERSION" in
+            26.*) ;;
+            *) echo "Expected Xcode 26.x, found $XCODE_VERSION"; exit 1 ;;
+          esac
+
+      - name: Compute Version
+        env:
+          VERSION_INPUT: ${{ github.event.inputs.version }}
+        run: |
+          if [ -n "$VERSION_INPUT" ]; then
+            VERSION="$VERSION_INPUT"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+
+          VERSION="${VERSION#v}"
+          TAG="v${VERSION}"
+          BUILD_NUMBER=${{ github.run_number }}
+
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+          echo "Building Tabata Ticker $VERSION ($BUILD_NUMBER)"
+
+      - name: Run Tests
+        run: swift test
+
+      - name: Install Apple Certificate and Provisioning Profiles
+        env:
+          CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          WATCH_PROVISIONING_PROFILE_BASE64: ${{ secrets.WATCH_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          CERTIFICATE_PATH="$RUNNER_TEMP/certificate.p12"
+          IOS_PROFILE_PATH="$RUNNER_TEMP/ios.mobileprovision"
+          WATCH_PROFILE_PATH="$RUNNER_TEMP/watch.mobileprovision"
+
+          echo "$CERTIFICATE_P12_BASE64" | base64 --decode -o "$CERTIFICATE_PATH"
+          echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode -o "$IOS_PROFILE_PATH"
+          echo "$WATCH_PROVISIONING_PROFILE_BASE64" | base64 --decode -o "$WATCH_PROFILE_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_NAME"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+
+          security import "$CERTIFICATE_PATH" \
+            -P "$CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$KEYCHAIN_NAME"
+
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "$KEYCHAIN_PASSWORD" \
+            "$KEYCHAIN_NAME"
+
+          security list-keychains -d user -s "$KEYCHAIN_NAME" $(security list-keychains -d user | tr -d '"')
+          security default-keychain -s "$KEYCHAIN_NAME"
+
+          PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILES_DIR"
+
+          IOS_PROFILE_PLIST=$(security cms -D -i "$IOS_PROFILE_PATH")
+          IOS_PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< "$IOS_PROFILE_PLIST")
+          IOS_PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< "$IOS_PROFILE_PLIST")
+          cp "$IOS_PROFILE_PATH" "$PROFILES_DIR/$IOS_PROFILE_UUID.mobileprovision"
+
+          WATCH_PROFILE_PLIST=$(security cms -D -i "$WATCH_PROFILE_PATH")
+          WATCH_PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< "$WATCH_PROFILE_PLIST")
+          WATCH_PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print Name" /dev/stdin <<< "$WATCH_PROFILE_PLIST")
+          cp "$WATCH_PROFILE_PATH" "$PROFILES_DIR/$WATCH_PROFILE_UUID.mobileprovision"
+
+          echo "IOS_PROFILE_UUID=$IOS_PROFILE_UUID" >> "$GITHUB_ENV"
+          echo "IOS_PROFILE_NAME=$IOS_PROFILE_NAME" >> "$GITHUB_ENV"
+          echo "WATCH_PROFILE_UUID=$WATCH_PROFILE_UUID" >> "$GITHUB_ENV"
+          echo "WATCH_PROFILE_NAME=$WATCH_PROFILE_NAME" >> "$GITHUB_ENV"
+
+          security find-identity -v -p codesigning "$KEYCHAIN_NAME"
+
+      - name: Install App Store Connect API Key
+        env:
+          ASC_API_KEY_P8_BASE64: ${{ secrets.ASC_API_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          mkdir -p ~/.private_keys
+          echo "$ASC_API_KEY_P8_BASE64" | base64 --decode -o ~/.private_keys/AuthKey_${ASC_KEY_ID}.p8
+
+      - name: Create Signing Overrides
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          cat > "$RUNNER_TEMP/Signing.xcconfig" <<EOF
+          DEVELOPMENT_TEAM = ${APPLE_TEAM_ID}
+          CODE_SIGN_STYLE = Manual
+          CODE_SIGN_IDENTITY = Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = ${IOS_PROFILE_NAME}
+          PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*] = ${WATCH_PROFILE_NAME}
+          EOF
+
+      - name: Archive
+        run: |
+          xcodebuild clean archive \
+            -project Tabata.xcodeproj \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$ARCHIVE_PATH" \
+            -xcconfig "$RUNNER_TEMP/Signing.xcconfig" \
+            MARKETING_VERSION="$VERSION" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
+
+      - name: Generate ExportOptions.plist
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>signingCertificate</key>
+            <string>Apple Distribution</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${IOS_BUNDLE_ID}</key>
+              <string>${IOS_PROFILE_NAME}</string>
+              <key>${WATCH_BUNDLE_ID}</key>
+              <string>${WATCH_PROFILE_NAME}</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$EXPORT_PATH"
+
+          IPA_PATH=$(find "$EXPORT_PATH" -name "*.ipa" -type f | head -1)
+          if [ -z "$IPA_PATH" ]; then
+            echo "Error: no .ipa file found in $EXPORT_PATH"
+            find "$EXPORT_PATH" -maxdepth 3 -type f -print
+            exit 1
+          fi
+
+          echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_ENV"
+          echo "IPA_ASSET_NAME=TabataTicker-${VERSION}-${BUILD_NUMBER}.ipa" >> "$GITHUB_ENV"
+
+      - name: Upload to App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcrun altool --upload-app \
+            --file "$IPA_PATH" \
+            --type ios \
+            --apiKey "$ASC_KEY_ID" \
+            --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_NOTES_INPUT: ${{ github.event.inputs.release_notes }}
+        run: |
+          RELEASE_NOTES="$RELEASE_NOTES_INPUT"
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="Uploaded build ${BUILD_NUMBER} to TestFlight."
+          fi
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$IPA_PATH#$IPA_ASSET_NAME" --clobber
+          else
+            gh release create "$TAG" "$IPA_PATH#$IPA_ASSET_NAME" \
+              --target "$GITHUB_SHA" \
+              --title "Tabata Ticker $VERSION" \
+              --notes "$RELEASE_NOTES"
+          fi
+
+      - name: Upload Archive Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Tabata-${{ env.BUILD_NUMBER }}.xcarchive
+          path: ${{ env.ARCHIVE_PATH }}
+          retention-days: 30
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: TabataTicker-${{ env.VERSION }}-${{ env.BUILD_NUMBER }}
+          path: ${{ env.IPA_PATH }}
+          retention-days: 30
+
+      - name: Cleanup
+        if: always()
+        run: |
+          security delete-keychain "$KEYCHAIN_NAME" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/certificate.p12"
+          rm -f "$RUNNER_TEMP/ios.mobileprovision"
+          rm -f "$RUNNER_TEMP/watch.mobileprovision"
+          rm -f "$RUNNER_TEMP/ExportOptions.plist"
+          rm -f "$RUNNER_TEMP/Signing.xcconfig"
+          rm -rf ~/.private_keys
+          if [ -n "${IOS_PROFILE_UUID:-}" ]; then
+            rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/$IOS_PROFILE_UUID.mobileprovision"
+          fi
+          if [ -n "${WATCH_PROFILE_UUID:-}" ]; then
+            rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/$WATCH_PROFILE_UUID.mobileprovision"
+          fi

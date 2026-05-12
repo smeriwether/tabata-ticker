@@ -13,6 +13,11 @@ Build:
 ```sh
 ~/.local/share/mise/installs/ruby/3.3.4/bin/ruby Tools/generate_project.rb
 xcodebuild -project Tabata.xcodeproj -target Tabata -configuration Debug -sdk iphonesimulator build CODE_SIGNING_ALLOWED=NO
-xcodebuild -project Tabata.xcodeproj -target "Tabata Watch App" -configuration Debug -sdk watchsimulator build CODE_SIGNING_ALLOWED=NO
+xcodebuild -project Tabata.xcodeproj -target "Tabata Watch App" -configuration Debug -sdk watchos build CODE_SIGNING_ALLOWED=NO
 swift test
 ```
+
+Release setup:
+
+- App Store/TestFlight setup is documented in [docs/APPSTORE_SETUP.md](docs/APPSTORE_SETUP.md).
+- GitHub release tags use `vX.Y.Z`; the release workflow uploads the build to TestFlight and attaches the exported `.ipa` to the GitHub Release.

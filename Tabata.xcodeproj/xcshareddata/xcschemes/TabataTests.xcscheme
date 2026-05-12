@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C033314B1DD5FADB768E9FDA"
+               BlueprintIdentifier = "64F6FDE49D985635B1EA39B4"
                BuildableName = "TabataTests.xctest"
                BlueprintName = "TabataTests"
                ReferencedContainer = "container:Tabata.xcodeproj">
@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C033314B1DD5FADB768E9FDA"
+               BlueprintIdentifier = "64F6FDE49D985635B1EA39B4"
                BuildableName = "TabataTests.xctest"
                BlueprintName = "TabataTests"
                ReferencedContainer = "container:Tabata.xcodeproj">
