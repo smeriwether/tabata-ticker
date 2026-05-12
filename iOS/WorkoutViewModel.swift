@@ -1,4 +1,4 @@
-import AudioToolbox
+import AVFoundation
 import Observation
 import SwiftUI
 import UIKit
@@ -137,12 +137,88 @@ final class WorkoutViewModel {
     }
 }
 
-private struct PhoneCuePerformer {
+private final class PhoneCuePerformer {
+    private let countdownPlayer = PhoneCuePerformer.makePlayer(frequency: 880, duration: 0.08)
+    private let transitionPlayer = PhoneCuePerformer.makePlayer(frequency: 1320, duration: 0.16)
+    private var didConfigureSession = false
+
     func playCountdown() {
-        AudioServicesPlaySystemSound(1104)
+        play(countdownPlayer)
     }
 
     func playTransition() {
-        AudioServicesPlaySystemSound(1005)
+        play(transitionPlayer)
+    }
+
+    private func play(_ player: AVAudioPlayer?) {
+        configureSession()
+        player?.currentTime = 0
+        player?.play()
+    }
+
+    private func configureSession() {
+        guard !didConfigureSession else {
+            return
+        }
+
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+            didConfigureSession = true
+        } catch {
+            return
+        }
+    }
+
+    private static func makePlayer(frequency: Double, duration: Double) -> AVAudioPlayer? {
+        guard let data = toneData(frequency: frequency, duration: duration) else {
+            return nil
+        }
+
+        let player = try? AVAudioPlayer(data: data)
+        player?.prepareToPlay()
+        return player
+    }
+
+    private static func toneData(frequency: Double, duration: Double) -> Data? {
+        let sampleRate = 22_050
+        let sampleCount = Int(duration * Double(sampleRate))
+        let byteCount = sampleCount * MemoryLayout<Int16>.size
+        var data = Data()
+
+        append("RIFF", to: &data)
+        append(UInt32(36 + byteCount).littleEndian, to: &data)
+        append("WAVE", to: &data)
+        append("fmt ", to: &data)
+        append(UInt32(16).littleEndian, to: &data)
+        append(UInt16(1).littleEndian, to: &data)
+        append(UInt16(1).littleEndian, to: &data)
+        append(UInt32(sampleRate).littleEndian, to: &data)
+        append(UInt32(sampleRate * MemoryLayout<Int16>.size).littleEndian, to: &data)
+        append(UInt16(MemoryLayout<Int16>.size).littleEndian, to: &data)
+        append(UInt16(16).littleEndian, to: &data)
+        append("data", to: &data)
+        append(UInt32(byteCount).littleEndian, to: &data)
+
+        for sampleIndex in 0..<sampleCount {
+            let position = Double(sampleIndex) / Double(sampleRate)
+            let envelope = min(1, Double(sampleCount - sampleIndex) / Double(sampleCount) * 4)
+            let value = sin(2 * Double.pi * frequency * position) * Double(Int16.max) * 0.25 * envelope
+            append(Int16(value).littleEndian, to: &data)
+        }
+
+        return data
+    }
+
+    private static func append(_ string: String, to data: inout Data) {
+        data.append(contentsOf: string.utf8)
+    }
+
+    private static func append<T>(_ value: T, to data: inout Data) {
+        var value = value
+        withUnsafeBytes(of: &value) { bytes in
+            data.append(contentsOf: bytes)
+        }
     }
 }
