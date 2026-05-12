@@ -39,8 +39,12 @@ private enum ContentRoute: Hashable {
 
 struct ContentView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @State private var viewModel = WorkoutViewModel()
+    private let viewModel: WorkoutViewModel
     @State private var path: [ContentRoute] = []
+
+    init(viewModel: WorkoutViewModel = WorkoutViewModel()) {
+        self.viewModel = viewModel
+    }
 
     var body: some View {
         NavigationStack(path: $path) {

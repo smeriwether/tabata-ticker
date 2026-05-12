@@ -37,6 +37,7 @@ struct WatchContentView: View {
                                 .frame(maxWidth: .infinity, minHeight: 32)
                         }
                         .buttonStyle(.glass)
+                        .foregroundStyle(.white)
                     }
                 }
                 .font(.caption.weight(.bold))
@@ -50,9 +51,6 @@ struct WatchContentView: View {
         .onAppear {
             viewModel.activate()
         }
-        .task(id: viewModel.state.isRunning) {
-            await tickWhileRunning()
-        }
     }
 
     @ViewBuilder
@@ -65,7 +63,7 @@ struct WatchContentView: View {
                     .frame(maxWidth: .infinity, minHeight: 32)
             }
             .buttonStyle(.glassProminent)
-            .foregroundStyle(.black)
+            .foregroundStyle(.white)
         } else {
             Button {
                 primaryAction()
@@ -74,7 +72,7 @@ struct WatchContentView: View {
                     .frame(maxWidth: .infinity, minHeight: 32)
             }
             .buttonStyle(.glass)
-            .foregroundStyle(.black)
+            .foregroundStyle(.white)
         }
     }
 
@@ -104,17 +102,6 @@ struct WatchContentView: View {
         [Color(presentation.background.start), Color(presentation.background.end)]
     }
 
-    @MainActor
-    private func tickWhileRunning() async {
-        guard viewModel.state.isRunning else {
-            return
-        }
-
-        while !Task.isCancelled, viewModel.state.isRunning {
-            viewModel.tick(now: Date())
-            try? await Task.sleep(nanoseconds: 200_000_000)
-        }
-    }
 }
 
 private extension Color {

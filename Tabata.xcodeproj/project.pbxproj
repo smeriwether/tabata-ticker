@@ -516,7 +516,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Watch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Tabata Ticker";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.merimerimeri.tabataticker;
 				MARKETING_VERSION = 1.0;
@@ -616,7 +617,8 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Watch/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Tabata Ticker";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.merimerimeri.tabataticker;
 				MARKETING_VERSION = 1.0;

@@ -28,7 +28,9 @@ final class WatchConnectivity: NSObject, WCSessionDelegate {
         let session = WCSession.default
 
         if session.isReachable {
-            session.sendMessage(payload, replyHandler: nil, errorHandler: nil)
+            session.sendMessage(payload, replyHandler: nil) { _ in
+                session.transferUserInfo(payload)
+            }
         } else {
             session.transferUserInfo(payload)
         }

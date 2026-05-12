@@ -17,10 +17,13 @@ final class WatchWorkoutViewModel {
     private let defaults: UserDefaults
     private let connectivity = WatchConnectivity()
     private let cuePerformer = WatchCuePerformer()
+    private let runtimeSessionController = WatchRuntimeSessionController()
     @ObservationIgnored
     private var lastCountdownCue: CountdownCue?
     @ObservationIgnored
     private var didActivate = false
+    @ObservationIgnored
+    private var tickTask: Task<Void, Never>?
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -64,13 +67,25 @@ final class WatchWorkoutViewModel {
             cuePerformer.playCountdown(soundsEnabled: state.soundsEnabled, hapticsEnabled: state.hapticsEnabled)
             lastCountdownCue = cue
         }
+
+        syncRunningState()
     }
 
     func toggleRunning() {
+        now = Date()
+        engine.toggleRunning(now: now)
+        state = engine.state
+        lastCountdownCue = nil
+        syncRunningState()
         connectivity.send(WatchCommandPayload(command: .toggleRunning, soundsEnabled: nil))
     }
 
     func reset() {
+        now = Date()
+        engine.reset()
+        state = engine.state
+        lastCountdownCue = nil
+        syncRunningState()
         connectivity.send(WatchCommandPayload(command: .reset, soundsEnabled: nil))
     }
 
@@ -80,6 +95,7 @@ final class WatchWorkoutViewModel {
         state.soundsEnabled = enabled
         engine = TabataEngine(state: state)
         lastCountdownCue = nil
+        syncRunningState()
         connectivity.send(WatchCommandPayload(command: .setSoundsEnabled, soundsEnabled: enabled))
     }
 
@@ -90,6 +106,91 @@ final class WatchWorkoutViewModel {
         state = newState
         engine = TabataEngine(state: newState)
         lastCountdownCue = nil
+        syncRunningState()
+    }
+
+    private func syncRunningState() {
+        if state.isRunning {
+            startTicking()
+        } else {
+            stopTicking()
+        }
+
+        runtimeSessionController.setRunning(state.isRunning)
+    }
+
+    private func startTicking() {
+        guard tickTask == nil else {
+            return
+        }
+
+        tickTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                guard let self, self.state.isRunning else {
+                    return
+                }
+
+                self.tick(now: Date())
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
+        }
+    }
+
+    private func stopTicking() {
+        tickTask?.cancel()
+        tickTask = nil
+    }
+}
+
+private final class WatchRuntimeSessionController: NSObject, WKExtendedRuntimeSessionDelegate {
+    private var session: WKExtendedRuntimeSession?
+    private var wantsSession = false
+    private var canStartSession = true
+
+    func setRunning(_ isRunning: Bool) {
+        wantsSession = isRunning
+
+        if isRunning {
+            start()
+        } else {
+            canStartSession = true
+            stop()
+        }
+    }
+
+    private func start() {
+        guard canStartSession, session == nil else {
+            return
+        }
+
+        let session = WKExtendedRuntimeSession()
+        session.delegate = self
+        self.session = session
+        session.start()
+    }
+
+    private func stop() {
+        session?.invalidate()
+        session = nil
+    }
+
+    func extendedRuntimeSessionDidStart(_ extendedRuntimeSession: WKExtendedRuntimeSession) {}
+
+    func extendedRuntimeSessionWillExpire(_ extendedRuntimeSession: WKExtendedRuntimeSession) {}
+
+    func extendedRuntimeSession(
+        _ extendedRuntimeSession: WKExtendedRuntimeSession,
+        didInvalidateWith reason: WKExtendedRuntimeSessionInvalidationReason,
+        error: (any Error)?
+    ) {
+        guard session === extendedRuntimeSession else {
+            return
+        }
+
+        session = nil
+        if wantsSession {
+            canStartSession = false
+        }
     }
 }
 

@@ -148,6 +148,8 @@ watch_target.build_configurations.each do |config|
   settings["SKIP_INSTALL"] = "YES"
   settings["SUPPORTED_PLATFORMS"] = config.name == "Debug" ? "watchsimulator" : "watchos"
   settings["TARGETED_DEVICE_FAMILY"] = "4"
+  settings["GENERATE_INFOPLIST_FILE"] = "NO"
+  settings["INFOPLIST_FILE"] = "Watch/Info.plist"
   settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
   settings["INFOPLIST_KEY_WKCompanionAppBundleIdentifier"] = BUNDLE_ID
   settings["SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
