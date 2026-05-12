@@ -60,9 +60,13 @@ jobs:
       - name: Ensure Device Platforms
         run: |
           xcodebuild -showsdks
-          xcodebuild -downloadPlatform iOS -architectureVariant universal
-          xcodebuild -downloadPlatform watchOS -architectureVariant universal
+          xcodebuild -downloadPlatform iOS -architectureVariant universal || true
+          xcodebuild -downloadPlatform watchOS -architectureVariant universal || true
           xcodebuild -showsdks
+          xcodebuild -showdestinations \
+            -project Tabata.xcodeproj \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" || true
 
       - name: Compute Version
         env:
@@ -260,7 +264,12 @@ jobs:
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-        run: ruby Tools/app_store_connect_signing.rb cleanup
+        run: |
+          if [ -n "${ASC_API_KEY_PATH:-}" ] && [ -f "$ASC_API_KEY_PATH" ]; then
+            ruby Tools/app_store_connect_signing.rb cleanup
+          else
+            echo "No App Store Connect signing assets to clean up."
+          fi
 
       - name: Cleanup
         if: always()
