@@ -8,6 +8,9 @@ APPLE_TEAM_ID = "8G4H6268W7"
 BUNDLE_ID = "com.merimerimeri.tabataticker"
 WATCH_BUNDLE_ID = "#{BUNDLE_ID}.watchkitapp"
 LIVE_ACTIVITY_BUNDLE_ID = "#{BUNDLE_ID}.liveactivity"
+BETA_BUNDLE_ID = "#{BUNDLE_ID}.beta"
+BETA_WATCH_BUNDLE_ID = "#{BETA_BUNDLE_ID}.watchkitapp"
+BETA_LIVE_ACTIVITY_BUNDLE_ID = "#{BETA_BUNDLE_ID}.liveactivity"
 
 FileUtils.rm_rf(PROJECT_PATH)
 
@@ -19,6 +22,11 @@ live_activity_target = project.new_target(:app_extension, "Tabata Live Activity"
 test_target = project.new_target(:unit_test_bundle, "TabataTests", :osx, "26.0")
 ios_target.add_dependency(watch_target)
 ios_target.add_dependency(live_activity_target)
+
+project.add_build_configuration("Beta", :release)
+[ios_target, watch_target, live_activity_target, test_target].each do |target|
+  target.add_build_configuration("Beta", :release)
+end
 
 def add_sources(project, target, paths)
   paths.each do |path|
@@ -118,17 +126,20 @@ ios_target.build_configurations.each do |config|
   settings = config.build_settings
   settings["GENERATE_INFOPLIST_FILE"] = "NO"
   settings["INFOPLIST_FILE"] = "iOS/Info.plist"
-  settings["PRODUCT_BUNDLE_IDENTIFIER"] = BUNDLE_ID
   settings["IPHONEOS_DEPLOYMENT_TARGET"] = "26.0"
+  settings["PRODUCT_BUNDLE_IDENTIFIER"] = config.name == "Beta" ? BETA_BUNDLE_ID : BUNDLE_ID
   settings["SDKROOT"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
   settings["SUPPORTED_PLATFORMS"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
   settings["TARGETED_DEVICE_FAMILY"] = "1,2"
-  if config.name == "Release"
-    settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
+  if config.name != "Debug"
+    settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = config.name == "Beta" ? "AppIconBeta" : "AppIcon"
     settings["CODE_SIGN_STYLE"] = "Manual"
     settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
     settings["PROVISIONING_PROFILE_SPECIFIER"] = "$(IOS_PROFILE_NAME)"
   end
+  settings["IOS_APP_ICON_PHONE_NAME"] = config.name == "Beta" ? "AppIconBeta60x60" : "AppIcon60x60"
+  settings["IOS_APP_ICON_IPAD_NAME"] = config.name == "Beta" ? "AppIconBeta76x76" : "AppIcon76x76"
+  settings["IOS_APP_ICON_IPAD_PRO_NAME"] = config.name == "Beta" ? "AppIconBeta83.5x83.5" : "AppIcon83.5x83.5"
   settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
   settings["SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
   settings["SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
@@ -136,13 +147,13 @@ end
 
 watch_target.build_configurations.each do |config|
   settings = config.build_settings
-  if config.name == "Release"
-    settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
+  if config.name != "Debug"
+    settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = config.name == "Beta" ? "AppIconBeta" : "AppIcon"
     settings["CODE_SIGN_STYLE"] = "Manual"
     settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
     settings["PROVISIONING_PROFILE_SPECIFIER"] = "$(WATCH_PROFILE_NAME)"
   end
-  settings["PRODUCT_BUNDLE_IDENTIFIER"] = WATCH_BUNDLE_ID
+  settings["PRODUCT_BUNDLE_IDENTIFIER"] = config.name == "Beta" ? BETA_WATCH_BUNDLE_ID : WATCH_BUNDLE_ID
   settings["WATCHOS_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = config.name == "Debug" ? "watchsimulator" : "watchos"
   settings["SKIP_INSTALL"] = "YES"
@@ -151,7 +162,7 @@ watch_target.build_configurations.each do |config|
   settings["GENERATE_INFOPLIST_FILE"] = "NO"
   settings["INFOPLIST_FILE"] = "Watch/Info.plist"
   settings["INFOPLIST_KEY_CFBundleDisplayName"] = APP_DISPLAY_NAME
-  settings["INFOPLIST_KEY_WKCompanionAppBundleIdentifier"] = BUNDLE_ID
+  settings["INFOPLIST_KEY_WKCompanionAppBundleIdentifier"] = config.name == "Beta" ? BETA_BUNDLE_ID : BUNDLE_ID
   settings["SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD"] = "NO"
 end
 
@@ -160,13 +171,13 @@ live_activity_target.build_configurations.each do |config|
   settings["APPLICATION_EXTENSION_API_ONLY"] = "YES"
   settings["GENERATE_INFOPLIST_FILE"] = "NO"
   settings["INFOPLIST_FILE"] = "LiveActivity/Info.plist"
-  settings["PRODUCT_BUNDLE_IDENTIFIER"] = LIVE_ACTIVITY_BUNDLE_ID
+  settings["PRODUCT_BUNDLE_IDENTIFIER"] = config.name == "Beta" ? BETA_LIVE_ACTIVITY_BUNDLE_ID : LIVE_ACTIVITY_BUNDLE_ID
   settings["IPHONEOS_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
   settings["SKIP_INSTALL"] = "YES"
   settings["SUPPORTED_PLATFORMS"] = config.name == "Debug" ? "iphonesimulator" : "iphoneos"
   settings["TARGETED_DEVICE_FAMILY"] = "1,2"
-  if config.name == "Release"
+  if config.name != "Debug"
     settings["CODE_SIGN_STYLE"] = "Manual"
     settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
     settings["PROVISIONING_PROFILE_SPECIFIER"] = "$(LIVE_ACTIVITY_PROFILE_NAME)"
@@ -175,7 +186,7 @@ end
 
 test_target.build_configurations.each do |config|
   settings = config.build_settings
-  settings["PRODUCT_BUNDLE_IDENTIFIER"] = "#{BUNDLE_ID}.tests"
+  settings["PRODUCT_BUNDLE_IDENTIFIER"] = config.name == "Beta" ? "#{BETA_BUNDLE_ID}.tests" : "#{BUNDLE_ID}.tests"
   settings["MACOSX_DEPLOYMENT_TARGET"] = "26.0"
   settings["SDKROOT"] = "macosx"
   settings["TEST_HOST"] = ""
@@ -187,6 +198,18 @@ ios_scheme = Xcodeproj::XCScheme.new
 ios_scheme.add_build_target(ios_target)
 ios_scheme.set_launch_target(ios_target)
 ios_scheme.save_as(PROJECT_PATH, "Tabata", true)
+
+beta_scheme = Xcodeproj::XCScheme.new
+beta_scheme.add_build_target(ios_target)
+beta_scheme.set_launch_target(ios_target)
+beta_scheme.save_as(PROJECT_PATH, "Tabata Beta", true)
+beta_scheme_path = File.join(PROJECT_PATH, "xcshareddata", "xcschemes", "Tabata Beta.xcscheme")
+beta_scheme_xml = File.read(beta_scheme_path)
+beta_scheme_xml.gsub!(
+  "<ArchiveAction\n      buildConfiguration = \"Release\"",
+  "<ArchiveAction\n      buildConfiguration = \"Beta\""
+)
+File.write(beta_scheme_path, beta_scheme_xml)
 
 watch_scheme = Xcodeproj::XCScheme.new
 watch_scheme.add_build_target(watch_target)

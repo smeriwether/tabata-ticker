@@ -21,16 +21,16 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SCHEME: Tabata
-  CONFIGURATION: Release
+  SCHEME: Tabata Beta
+  CONFIGURATION: Beta
   ARCHIVE_PATH: build/Tabata.xcarchive
   EXPORT_PATH: build/export
   KEYCHAIN_NAME: build.keychain-db
   KEYCHAIN_PASSWORD: temporary-ci-password
   APPLE_TEAM_ID: 8G4H6268W7
-  IOS_BUNDLE_ID: com.merimerimeri.tabataticker
-  WATCH_BUNDLE_ID: com.merimerimeri.tabataticker.watchkitapp
-  LIVE_ACTIVITY_BUNDLE_ID: com.merimerimeri.tabataticker.liveactivity
+  IOS_BUNDLE_ID: com.merimerimeri.tabataticker.beta
+  WATCH_BUNDLE_ID: com.merimerimeri.tabataticker.beta.watchkitapp
+  LIVE_ACTIVITY_BUNDLE_ID: com.merimerimeri.tabataticker.beta.liveactivity
 
 jobs:
   release:

@@ -12,11 +12,19 @@ Register these explicit App IDs in the Apple Developer portal:
 | Watch companion | `com.merimerimeri.tabataticker.watchkitapp` |
 | Live Activity extension | `com.merimerimeri.tabataticker.liveactivity` |
 
+TestFlight builds use separate bundle IDs so the beta can be installed next to the App Store version:
+
+| Target | Beta Bundle ID |
+| --- | --- |
+| iOS app | `com.merimerimeri.tabataticker.beta` |
+| Watch companion | `com.merimerimeri.tabataticker.beta.watchkitapp` |
+| Live Activity extension | `com.merimerimeri.tabataticker.beta.liveactivity` |
+
 The Xcode project generator sets the Apple team to `8G4H6268W7`, matching the existing MenuMines signing setup.
 
 ## App Store Connect
 
-Create one app record:
+Create an app record for production:
 
 | Field | Value |
 | --- | --- |
@@ -24,6 +32,15 @@ Create one app record:
 | Name | `Tabata Ticker` |
 | Bundle ID | `com.merimerimeri.tabataticker` |
 | SKU | `tabataticker` |
+
+Create a second app record for TestFlight:
+
+| Field | Value |
+| --- | --- |
+| Platform | iOS |
+| Name | `Tabata Ticker Beta` |
+| Bundle ID | `com.merimerimeri.tabataticker.beta` |
+| SKU | `tabataticker-beta` |
 
 Because this app ships with an Apple Watch companion, fill in the required watchOS metadata and screenshots before external TestFlight testing or App Store submission.
 

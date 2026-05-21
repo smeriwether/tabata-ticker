@@ -14,7 +14,7 @@
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
-				<string>AppIcon60x60</string>
+				<string>$(IOS_APP_ICON_PHONE_NAME)</string>
 			</array>
 		</dict>
 	</dict>
@@ -24,8 +24,8 @@
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
-				<string>AppIcon76x76</string>
-				<string>AppIcon83.5x83.5</string>
+				<string>$(IOS_APP_ICON_IPAD_NAME)</string>
+				<string>$(IOS_APP_ICON_IPAD_PRO_NAME)</string>
 			</array>
 		</dict>
 	</dict>
