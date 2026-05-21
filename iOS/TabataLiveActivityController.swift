@@ -113,11 +113,11 @@ private extension TabataLiveActivityAttributes.ContentState {
         switch state.phase {
         case .work:
             return phaseRemaining
-                + state.config.restDuration
                 + TimeInterval(max(0, state.config.rounds - state.round)) * fullFutureRoundDuration
         case .rest:
             return phaseRemaining
-                + TimeInterval(max(0, state.config.rounds - state.round)) * fullFutureRoundDuration
+                + TimeInterval(max(0, state.config.rounds - state.round)) * state.config.workDuration
+                + TimeInterval(max(0, state.config.rounds - state.round - 1)) * state.config.restDuration
         case .idle, .countdown, .complete:
             return 0
         }

@@ -57,6 +57,10 @@ extension TabataLiveActivityAttributes.ContentState {
             phaseStart = phaseStart.addingTimeInterval(TimeInterval(phaseDuration))
 
             if displayPhase == "work" {
+                if displayRound == totalRounds {
+                    return completeDisplayState()
+                }
+
                 displayPhase = "rest"
                 phaseDuration = restSeconds
             } else if displayRound < totalRounds {

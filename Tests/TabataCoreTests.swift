@@ -69,11 +69,24 @@ final class TabataCoreTests: XCTestCase {
         var engine = TabataEngine()
 
         startWorkout(&engine, now: start)
-        let state = engine.tick(now: start.addingTimeInterval(240))
+        let state = engine.tick(now: start.addingTimeInterval(230))
 
         XCTAssertEqual(state.phase, .complete)
+        XCTAssertEqual(state.round, 8)
         XCTAssertFalse(state.isRunning)
-        XCTAssertEqual(state.remaining(at: start.addingTimeInterval(240)), 0)
+        XCTAssertEqual(state.remaining(at: start.addingTimeInterval(230)), 0)
+    }
+
+    func testFinalWorkRoundSkipsRestAndCompletes() {
+        let start = Date(timeIntervalSince1970: 100)
+        let config = TabataConfig(rounds: 2, workDuration: 20, restDuration: 10)
+        var engine = TabataEngine(state: .idle(config: config))
+
+        startWorkout(&engine, now: start)
+        let state = engine.tick(now: start.addingTimeInterval(50))
+
+        XCTAssertEqual(state.phase, .complete)
+        XCTAssertEqual(state.round, 2)
     }
 
     func testPauseAndResumePreserveRemainingTime() {

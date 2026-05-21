@@ -498,10 +498,16 @@ struct TabataEngine {
                 state.round = 1
                 state.phaseStartedAt = nextStartedAt
                 state.phaseDuration = state.config.workDuration
-            case .work:
+            case .work where state.round < state.config.rounds:
                 state.phase = .rest
                 state.phaseStartedAt = nextStartedAt
                 state.phaseDuration = state.config.restDuration
+            case .work:
+                state.phase = .complete
+                state.phaseStartedAt = nil
+                state.phaseDuration = 0
+                state.isRunning = false
+                state.pausedRemaining = 0
             case .rest where state.round < state.config.rounds:
                 state.round += 1
                 state.phase = .work
