@@ -103,6 +103,10 @@ struct ContentView: View {
                     get: { viewModel.state.hapticsEnabled },
                     set: { viewModel.setHapticsEnabled($0) }
                 ),
+                startCountdownEnabled: Binding(
+                    get: { viewModel.state.startCountdownEnabled },
+                    set: { viewModel.setStartCountdownEnabled($0) }
+                ),
                 presets: viewModel.presets,
                 canManageCustomPresets: viewModel.canManageCustomPresets,
                 onEditPreset: { preset in
@@ -420,6 +424,7 @@ struct ContentView: View {
 private struct SettingsView: View {
     @Binding var soundsEnabled: Bool
     @Binding var hapticsEnabled: Bool
+    @Binding var startCountdownEnabled: Bool
     let presets: [TabataPreset]
     let canManageCustomPresets: Bool
     let onEditPreset: (TabataPreset) -> Void
@@ -451,6 +456,19 @@ private struct SettingsView: View {
                             .font(.headline)
 
                         Text(hapticsEnabled ? "On" : "Off")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                }
+                .tint(.green)
+                .foregroundStyle(.white)
+
+                Toggle(isOn: $startCountdownEnabled) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Start Countdown before Workout")
+                            .font(.headline)
+
+                        Text(startCountdownEnabled ? "5 seconds" : "Off")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.white.opacity(0.7))
                     }

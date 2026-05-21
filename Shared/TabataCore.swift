@@ -2,6 +2,7 @@ import Foundation
 
 enum TabataPhase: String, Codable, Equatable, Sendable {
     case idle
+    case countdown
     case work
     case rest
     case complete
@@ -171,6 +172,8 @@ struct TabataPresetStore {
 }
 
 struct TabataState: Codable, Equatable, Sendable {
+    static let startCountdownDuration: TimeInterval = 5
+
     var config: TabataConfig
     var phase: TabataPhase
     var round: Int
@@ -180,6 +183,7 @@ struct TabataState: Codable, Equatable, Sendable {
     var pausedRemaining: TimeInterval?
     var soundsEnabled: Bool
     var hapticsEnabled: Bool
+    var startCountdownEnabled: Bool
 
     static func idle(config: TabataConfig = .classic) -> TabataState {
         TabataState(
@@ -191,7 +195,8 @@ struct TabataState: Codable, Equatable, Sendable {
             isRunning: false,
             pausedRemaining: config.workDuration,
             soundsEnabled: true,
-            hapticsEnabled: true
+            hapticsEnabled: true,
+            startCountdownEnabled: true
         )
     }
 
@@ -211,6 +216,36 @@ struct TabataState: Codable, Equatable, Sendable {
         return max(0, phaseDuration - now.timeIntervalSince(phaseStartedAt))
     }
 
+}
+
+extension TabataState {
+    private enum CodingKeys: String, CodingKey {
+        case config
+        case phase
+        case round
+        case phaseStartedAt
+        case phaseDuration
+        case isRunning
+        case pausedRemaining
+        case soundsEnabled
+        case hapticsEnabled
+        case startCountdownEnabled
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        config = try container.decode(TabataConfig.self, forKey: .config)
+        phase = try container.decode(TabataPhase.self, forKey: .phase)
+        round = try container.decode(Int.self, forKey: .round)
+        phaseStartedAt = try container.decodeIfPresent(Date.self, forKey: .phaseStartedAt)
+        phaseDuration = try container.decode(TimeInterval.self, forKey: .phaseDuration)
+        isRunning = try container.decode(Bool.self, forKey: .isRunning)
+        pausedRemaining = try container.decodeIfPresent(TimeInterval.self, forKey: .pausedRemaining)
+        soundsEnabled = try container.decode(Bool.self, forKey: .soundsEnabled)
+        hapticsEnabled = try container.decode(Bool.self, forKey: .hapticsEnabled)
+        startCountdownEnabled = try container.decodeIfPresent(Bool.self, forKey: .startCountdownEnabled) ?? true
+    }
 }
 
 struct TabataColor: Equatable, Sendable {
@@ -248,6 +283,9 @@ struct TabataPresentation: Equatable, Sendable {
         if state.phase == .complete {
             primaryButtonTitle = "Back Home"
             primaryAction = .reset
+        } else if state.phase == .countdown {
+            primaryButtonTitle = "Cancel"
+            primaryAction = .reset
         } else if state.phase == .idle {
             primaryButtonTitle = "Start"
             primaryAction = .toggleRunning
@@ -260,6 +298,9 @@ struct TabataPresentation: Equatable, Sendable {
         case .idle:
             phoneRoundText = "\(state.config.rounds) rounds"
             watchRoundText = "\(state.config.rounds) rounds"
+        case .countdown:
+            phoneRoundText = "Get ready"
+            watchRoundText = "Get ready"
         case .complete:
             phoneRoundText = "Complete"
             watchRoundText = "Complete"
@@ -276,6 +317,9 @@ struct TabataPresentation: Equatable, Sendable {
             case .idle:
                 title = "TABATA"
                 background = .idle
+            case .countdown:
+                title = "READY"
+                background = .countdown
             case .work:
                 title = "WORK"
                 background = .work
@@ -298,6 +342,10 @@ private extension TabataGradient {
     static let work = TabataGradient(
         start: TabataColor(red: 0.92, green: 0.48, blue: 0.12),
         end: TabataColor(red: 0.70, green: 0.30, blue: 0.06)
+    )
+    static let countdown = TabataGradient(
+        start: TabataColor(red: 0.12, green: 0.60, blue: 0.70),
+        end: TabataColor(red: 0.22, green: 0.26, blue: 0.76)
     )
     static let rest = TabataGradient(
         start: TabataColor(red: 0.00, green: 0.48, blue: 0.95),
@@ -326,8 +374,36 @@ struct TabataEngine {
             return
         }
 
+        if state.startCountdownEnabled {
+            startCountdown(now: now)
+            return
+        }
+
+        startWork(now: now)
+    }
+
+    private mutating func startCountdown(now: Date) {
         let soundsEnabled = state.soundsEnabled
         let hapticsEnabled = state.hapticsEnabled
+        let startCountdownEnabled = state.startCountdownEnabled
+        state = TabataState(
+            config: state.config,
+            phase: .countdown,
+            round: 0,
+            phaseStartedAt: now,
+            phaseDuration: TabataState.startCountdownDuration,
+            isRunning: true,
+            pausedRemaining: nil,
+            soundsEnabled: soundsEnabled,
+            hapticsEnabled: hapticsEnabled,
+            startCountdownEnabled: startCountdownEnabled
+        )
+    }
+
+    private mutating func startWork(now: Date) {
+        let soundsEnabled = state.soundsEnabled
+        let hapticsEnabled = state.hapticsEnabled
+        let startCountdownEnabled = state.startCountdownEnabled
         state = TabataState(
             config: state.config,
             phase: .work,
@@ -337,7 +413,8 @@ struct TabataEngine {
             isRunning: true,
             pausedRemaining: nil,
             soundsEnabled: soundsEnabled,
-            hapticsEnabled: hapticsEnabled
+            hapticsEnabled: hapticsEnabled,
+            startCountdownEnabled: startCountdownEnabled
         )
     }
 
@@ -374,9 +451,11 @@ struct TabataEngine {
     mutating func reset() {
         let soundsEnabled = state.soundsEnabled
         let hapticsEnabled = state.hapticsEnabled
+        let startCountdownEnabled = state.startCountdownEnabled
         state = .idle(config: state.config)
         state.soundsEnabled = soundsEnabled
         state.hapticsEnabled = hapticsEnabled
+        state.startCountdownEnabled = startCountdownEnabled
     }
 
     mutating func setSoundsEnabled(_ enabled: Bool) {
@@ -387,17 +466,21 @@ struct TabataEngine {
         state.hapticsEnabled = enabled
     }
 
+    mutating func setStartCountdownEnabled(_ enabled: Bool) {
+        state.startCountdownEnabled = enabled
+    }
+
     mutating func tick(now: Date) -> TabataState {
         advance(now: now)
         return state
     }
 
     private mutating func advance(now: Date) {
-        guard state.isRunning, state.isWorkoutPhase else {
+        guard state.isRunning, state.phase == .countdown || state.isWorkoutPhase else {
             return
         }
 
-        while state.isRunning, state.isWorkoutPhase {
+        while state.isRunning, state.phase == .countdown || state.isWorkoutPhase {
             guard let startedAt = state.phaseStartedAt else {
                 return
             }
@@ -410,6 +493,11 @@ struct TabataEngine {
             let nextStartedAt = startedAt.addingTimeInterval(state.phaseDuration)
 
             switch state.phase {
+            case .countdown:
+                state.phase = .work
+                state.round = 1
+                state.phaseStartedAt = nextStartedAt
+                state.phaseDuration = state.config.workDuration
             case .work:
                 state.phase = .rest
                 state.phaseStartedAt = nextStartedAt
@@ -440,12 +528,20 @@ struct CountdownCue: Hashable, Sendable {
 
 enum TabataCuePolicy {
     static func countdownCue(in state: TabataState, now: Date) -> CountdownCue? {
-        guard (state.soundsEnabled || state.hapticsEnabled), state.isRunning, state.isWorkoutPhase else {
+        guard (state.soundsEnabled || state.hapticsEnabled), state.isRunning, state.phase == .countdown || state.isWorkoutPhase else {
             return nil
         }
 
         let second = Int(ceil(state.remaining(at: now)))
-        let threshold = state.phase == .work ? 5 : 3
+        let threshold: Int
+        switch state.phase {
+        case .countdown, .work:
+            threshold = 5
+        case .rest:
+            threshold = 3
+        case .idle, .complete:
+            return nil
+        }
 
         guard (1...threshold).contains(second) else {
             return nil

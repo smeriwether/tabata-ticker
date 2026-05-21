@@ -11,6 +11,7 @@ final class WatchWorkoutViewModel {
 
     private static let soundsEnabledKey = "soundsEnabled"
     private static let hapticsEnabledKey = "hapticsEnabled"
+    private static let startCountdownEnabledKey = "startCountdownEnabled"
 
     @ObservationIgnored
     private var engine: TabataEngine
@@ -34,6 +35,9 @@ final class WatchWorkoutViewModel {
         }
         if defaults.object(forKey: Self.hapticsEnabledKey) != nil {
             initialState.hapticsEnabled = defaults.bool(forKey: Self.hapticsEnabledKey)
+        }
+        if defaults.object(forKey: Self.startCountdownEnabledKey) != nil {
+            initialState.startCountdownEnabled = defaults.bool(forKey: Self.startCountdownEnabledKey)
         }
 
         state = initialState
@@ -104,6 +108,7 @@ final class WatchWorkoutViewModel {
         now = Date()
         defaults.set(newState.soundsEnabled, forKey: Self.soundsEnabledKey)
         defaults.set(newState.hapticsEnabled, forKey: Self.hapticsEnabledKey)
+        defaults.set(newState.startCountdownEnabled, forKey: Self.startCountdownEnabledKey)
         state = newState
         engine = TabataEngine(state: newState)
         lastCountdownCue = nil

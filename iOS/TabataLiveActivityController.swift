@@ -97,7 +97,7 @@ private extension TabataLiveActivityAttributes.ContentState {
             return "W"
         case .rest:
             return "R"
-        case .idle, .complete:
+        case .idle, .countdown, .complete:
             return "T"
         }
     }
@@ -118,7 +118,7 @@ private extension TabataLiveActivityAttributes.ContentState {
         case .rest:
             return phaseRemaining
                 + TimeInterval(max(0, state.config.rounds - state.round)) * fullFutureRoundDuration
-        case .idle, .complete:
+        case .idle, .countdown, .complete:
             return 0
         }
     }
