@@ -246,7 +246,7 @@ jobs:
             exit "$ALTOOL_STATUS"
           fi
 
-          if grep -Eq "UPLOAD FAILED|Validation failed|Failed to upload package" "$RUNNER_TEMP/altool-upload.log"; then
+          if grep -Eq "ERROR:|UPLOAD FAILED|Validation failed|Failed to upload package" "$RUNNER_TEMP/altool-upload.log"; then
             echo "App Store Connect upload failed validation."
             exit 1
           fi
