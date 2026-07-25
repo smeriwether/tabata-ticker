@@ -4,6 +4,7 @@ import Foundation
 @MainActor
 final class TabataLiveActivityController {
     private var activity: Activity<TabataLiveActivityAttributes>?
+    private var didReportRequestFailure = false
 
     func sync(state: TabataState, now: Date) {
         guard state.isWorkoutPhase else {
@@ -43,13 +44,20 @@ final class TabataLiveActivityController {
             )
         } catch {
             activity = nil
-            TabataDiagnostics.report("Starting the Live Activity failed", error: error)
+
+            // Requesting again on the next phase change is what lets an activity appear once the app
+            // reaches the foreground, so only the first failure of an attempt is worth reporting.
+            if !didReportRequestFailure {
+                didReportRequestFailure = true
+                TabataDiagnostics.report("Starting the Live Activity failed", error: error)
+            }
         }
     }
 
     func end() {
         let activityIDs = Activity<TabataLiveActivityAttributes>.activities.map(\.id)
         activity = nil
+        didReportRequestFailure = false
 
         guard !activityIDs.isEmpty else {
             return

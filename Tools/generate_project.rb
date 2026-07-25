@@ -55,6 +55,7 @@ ios_sources = shared_sources + [
   "iOS/ContentView.swift",
   "iOS/WorkoutViewModel.swift",
   "iOS/PhoneConnectivity.swift",
+  "iOS/TabataAppShortcuts.swift",
   "iOS/TabataLiveActivityController.swift",
   "LiveActivity/TabataLiveActivityAttributes.swift",
   "LiveActivity/TabataLiveActivityIntents.swift"

@@ -21,10 +21,10 @@ struct ToggleWorkoutIntent: LiveActivityIntent {
     }
 }
 
+// Also offered to Siri and Shortcuts, unlike the toggle above, which has no sensible spoken form.
 struct EndWorkoutIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "End Workout"
     static let description = IntentDescription("Ends the current workout and returns the timer to the start.")
-    static let isDiscoverable = false
 
     func perform() async throws -> some IntentResult {
         #if TABATA_APP

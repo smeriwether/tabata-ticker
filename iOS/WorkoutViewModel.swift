@@ -232,11 +232,11 @@ final class WorkoutViewModel {
     private func handle(_ payload: WatchCommandPayload) {
         switch payload.command {
         case .start:
-            startFromWatch()
+            start()
         case .pause:
-            pauseFromWatch()
+            pause()
         case .resume:
-            resumeFromWatch()
+            resume()
         case .reset:
             reset()
         case .setSoundsEnabled:
@@ -302,7 +302,7 @@ final class WorkoutViewModel {
         tickTask = nil
     }
 
-    private func startFromWatch() {
+    func start() {
         guard state.phase == .idle || state.phase == .complete else {
             return
         }
@@ -315,7 +315,7 @@ final class WorkoutViewModel {
         publishState()
     }
 
-    private func pauseFromWatch() {
+    func pause() {
         guard state.isWorkoutPhase, state.isRunning else {
             return
         }
@@ -328,7 +328,7 @@ final class WorkoutViewModel {
         publishState()
     }
 
-    private func resumeFromWatch() {
+    func resume() {
         guard state.isWorkoutPhase, !state.isRunning else {
             return
         }
