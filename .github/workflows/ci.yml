@@ -39,9 +39,9 @@ jobs:
         run: |
           xcodebuild build \
             -project Tabata.xcodeproj \
-            -target Tabata \
+            -scheme Tabata \
             -configuration Debug \
-            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Build Watch App
