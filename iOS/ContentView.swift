@@ -296,7 +296,7 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity, minHeight: primaryButtonHeight)
             }
             .buttonStyle(.glass)
-            .foregroundStyle(.black)
+            .foregroundStyle(glassControlForeground)
         }
     }
 
