@@ -38,6 +38,10 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 90
     if: ${{ !contains(github.ref_name, '-direct') }}
+    env:
+      SENTRY_ORG: merimerimeri-software
+      SENTRY_PROJECT: tabata-ticker
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
     steps:
       - name: Checkout
@@ -250,6 +254,20 @@ jobs:
             echo "App Store Connect upload failed validation."
             exit 1
           fi
+
+      # Runs after the TestFlight upload so a Sentry outage cannot keep a build from testers,
+      # but still fails the run, since silently shipping unsymbolicated crashes is the thing
+      # this step exists to prevent.
+      - name: Upload Debug Symbols to Sentry
+        if: env.SENTRY_AUTH_TOKEN != ''
+        run: |
+          # Installed into the runner temp directory because the installer refuses to overwrite an
+          # existing sentry-cli and would otherwise need sudo for /usr/local/bin.
+          curl -sL https://sentry.io/get-cli/ | INSTALL_DIR="$RUNNER_TEMP" sh
+          "$RUNNER_TEMP/sentry-cli" debug-files upload \
+            --org "$SENTRY_ORG" \
+            --project "$SENTRY_PROJECT" \
+            "$ARCHIVE_PATH/dSYMs"
 
       - name: Publish GitHub Release
         env:
