@@ -29,6 +29,21 @@ final class WorkoutViewModel {
     @ObservationIgnored
     private var tickTask: Task<Void, Never>?
 
+    private static var currentInstance: WorkoutViewModel?
+
+    // Live Activity buttons run their intent in this process without the SwiftUI environment, so the
+    // running view model is reachable here. It is created on demand, which covers a button press
+    // that launches the app in the background: the workout it acts on is restored from disk.
+    static func shared() -> WorkoutViewModel {
+        if let currentInstance {
+            return currentInstance
+        }
+
+        let workout = WorkoutViewModel()
+        currentInstance = workout
+        return workout
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         let presetStore = TabataPresetStore(defaults: defaults)

@@ -7,77 +7,79 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0BE60BEB3ED6DE5A8B3066E9 /* PhoneConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020891A08469F63F2E38E7F1 /* PhoneConnectivity.swift */; };
-		0EFCE2F45A7BA0244786F057 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 711487A00D6808CEDC275730 /* Assets.xcassets */; };
-		1434E8F2E257784FD362890A /* TabataCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9FC0D5DD60A7A324FBF662B /* TabataCoreTests.swift */; };
-		17166A775BF25E4B60B97546 /* TabataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A181AB9D094D5B0843BA81A7 /* TabataCore.swift */; };
-		183D7B11CB451433C4110224 /* AppIcon76x76@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = F1A06C3ED500A23C6B12479A /* AppIcon76x76@2x~ipad.png */; };
-		29A77BF7843DAC84A639C41F /* WatchWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B266DFCEAD88AD23A1C718 /* WatchWorkoutViewModel.swift */; };
-		2AFE02C656A13D1E36523B54 /* AppIcon60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96EBA8B17EBE142C3760DFC9 /* AppIcon60x60@2x.png */; };
-		2FA1B1C006C1AD5F5B5C51D8 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = A15C24469C5F141672684C6A /* Sentry */; };
-		3962C555C1DE0862B0E8F233 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF5BEADBEB3D2463B75F08D /* WatchContentView.swift */; };
-		3A53B162FF32C9243B73D93A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 711487A00D6808CEDC275730 /* Assets.xcassets */; };
-		420B1CC4A936E475FB64BBDC /* TabataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A181AB9D094D5B0843BA81A7 /* TabataCore.swift */; };
-		42BCD991965502239B5761D2 /* TabataLiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF16059BCD13603E295749A /* TabataLiveActivityAttributes.swift */; };
-		450612816A67A3A5C48E2213 /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AD3E5FCB6FCB830FC738BC4 /* WatchConnectivity.swift */; };
-		4ECE79266A364BB7E5BC4E7A /* AppIcon83.5x83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 54DDFC7B3007EBFFE2FE4835 /* AppIcon83.5x83.5@2x~ipad.png */; };
-		4FFFE59FE0B624C81DD08630 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44614CC10B9F4BFFB2B668D1 /* Foundation.framework */; };
-		527A37CDEDD78F01808B3000 /* AppIconBeta60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AB011EEE467285D00BF42201 /* AppIconBeta60x60@2x.png */; };
-		594D1523150C3E4E08B4B1A5 /* Tabata Live Activity.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4972C6D86861CE0841537260 /* Tabata Live Activity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		5A75B0ACBBE577C0BB8A71DE /* AppIconBeta60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 710A06EC31FEBE08D115E52B /* AppIconBeta60x60@3x.png */; };
-		5B909E05B07A4F44E2BDE555 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AFBB4673D28A5DC43FFFAA7 /* Foundation.framework */; };
-		5F27255A40D51DB058ECC9EE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44614CC10B9F4BFFB2B668D1 /* Foundation.framework */; };
-		6CE5A40828BA588F5744DCB4 /* AppIconBeta83.5x83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 63EE6E9B552891CA90745A9C /* AppIconBeta83.5x83.5@2x~ipad.png */; };
-		7D11391A867199B4EC3AB854 /* TabataWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2735BC1F933ED6ACDD96D23 /* TabataWatchApp.swift */; };
-		8E45D7B7D6B73A21A88FCF52 /* Tabata Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 06B87698F28267CC35A1782C /* Tabata Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		9039D2F401AF18C6EB879DAD /* TabataCore in Frameworks */ = {isa = PBXBuildFile; productRef = A951EB864417AE8F8936A7A2 /* TabataCore */; };
-		A3105471008B7EF88BDE9A40 /* WorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA1D64307D82063193EB719 /* WorkoutViewModel.swift */; };
-		BC77F927D92849B470E81056 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5036EBA53684BFEBF001CA /* ContentView.swift */; };
-		C2746D57B257D056D9C08C40 /* TabataLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE176F36B3FB7928B65B226 /* TabataLiveActivityWidget.swift */; };
-		E200C6B74333206B556941FC /* AppIconBeta76x76@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 3F24BEBC0F0D17D7E301192B /* AppIconBeta76x76@2x~ipad.png */; };
-		E22AD86E3BFFF789A47931DC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8B066FCF00C5E489E239D89 /* Cocoa.framework */; };
-		E9F51446F7BE386A02128B19 /* TabataLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFA6EC84A51B74710075751 /* TabataLiveActivityController.swift */; };
-		F14B87B92341632A8CA657DA /* TabataLiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF16059BCD13603E295749A /* TabataLiveActivityAttributes.swift */; };
-		FD5A3717E70BD75150D9FC5D /* TabataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E57FC2FD59DDFAEDFE0FBC /* TabataApp.swift */; };
-		FE6788A487C41F903534D9A5 /* AppIcon60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 255890EB215091AF52FF94A8 /* AppIcon60x60@3x.png */; };
+		086FCFB91C19EC0B7003879B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE9FEF34F45EB40CC016E073 /* ContentView.swift */; };
+		12F05EFC4AE5E3D219B9A66C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A24060DAD6C5914238779F3C /* Assets.xcassets */; };
+		152ADF15DA12FC412629B82A /* TabataCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6F2C641927E45A39269A27EF /* TabataCore */; };
+		1CA8ED9FB461679AB0739BE3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27A1AD4BAB59E47F7422C68B /* Cocoa.framework */; };
+		24062B8D9DEB9A964C0542FF /* AppIconBeta60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9231C20E948F812A4D98ADB2 /* AppIconBeta60x60@2x.png */; };
+		25764BF44E4F207BC7DCE0E4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC41E38387EAFDE72C4CCCDF /* Foundation.framework */; };
+		325EE723220E9E3E162EDE85 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86392553BFD21EED14DC6CFC /* Foundation.framework */; };
+		3F93737FC8F787C102777252 /* AppIconBeta76x76@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = A9D8DD7FA3B948018DDF431D /* AppIconBeta76x76@2x~ipad.png */; };
+		56DC7715B823A13D9F2D4315 /* TabataLiveActivityIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040BB7F1D4BBC03E7D14CF77 /* TabataLiveActivityIntents.swift */; };
+		66A4BDC58B172FCB46A00BDF /* TabataLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743B6F776DF9B8BC5794812E /* TabataLiveActivityController.swift */; };
+		83DD953A346FA52EE7E5D65E /* AppIcon76x76@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = CC36060F1A37FB24F1BF18AF /* AppIcon76x76@2x~ipad.png */; };
+		8F8828F93402DC5A7B6EC161 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F62E7CF95A40431B0C36F4 /* WatchContentView.swift */; };
+		937FB00064FC976140947140 /* WatchConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F728CFD3DAA2FC132D691E2 /* WatchConnectivity.swift */; };
+		93F93414FF3742BBFE66B3E4 /* Tabata Live Activity.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E0BAF5BE918A031D6CF07124 /* Tabata Live Activity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		94593CF8C44550992DE5D2FD /* AppIcon60x60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 08DEE9D97C28D8104B9B2401 /* AppIcon60x60@2x.png */; };
+		961AF8E3C4D4949E805BE78F /* AppIconBeta83.5x83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 256665F49E144ED7AD433FA5 /* AppIconBeta83.5x83.5@2x~ipad.png */; };
+		9D439FE1DF2DBE9051DBB38E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A24060DAD6C5914238779F3C /* Assets.xcassets */; };
+		A5890A44EA40940609A02D64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86392553BFD21EED14DC6CFC /* Foundation.framework */; };
+		A883BC3A61DC210DD16F3490 /* WorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2640F901B92AC89399019E3 /* WorkoutViewModel.swift */; };
+		AF5230DE8ADF97604C09E85A /* AppIconBeta60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = FB869D8A53973ED82BD338DB /* AppIconBeta60x60@3x.png */; };
+		B6298BC01B2F3C911A1F10F6 /* TabataApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D690F3F932478C11D39AF57B /* TabataApp.swift */; };
+		B9394F8EE54E9EDBBF4B9AB1 /* TabataLiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B64A3A71C3BB453BD053B54 /* TabataLiveActivityAttributes.swift */; };
+		BAD781E3543B92A4DB932C87 /* TabataLiveActivityIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040BB7F1D4BBC03E7D14CF77 /* TabataLiveActivityIntents.swift */; };
+		BAEEBFD702F27E131CD79F6F /* AppIcon83.5x83.5@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 09119116B79D3EF4533083E0 /* AppIcon83.5x83.5@2x~ipad.png */; };
+		BB930929072D552DB1226B70 /* WatchWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2390AA38876928DB841673 /* WatchWorkoutViewModel.swift */; };
+		C1239DF9FBF9A9C4F6FD5054 /* TabataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E07EA031D4A112A8AA4736 /* TabataCore.swift */; };
+		CA598BEA42F6BEC7B30C8B83 /* TabataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E07EA031D4A112A8AA4736 /* TabataCore.swift */; };
+		CAD4FF4D7CEBBB395A759B0C /* TabataLiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B64A3A71C3BB453BD053B54 /* TabataLiveActivityAttributes.swift */; };
+		DB9416F6F39A8BF8B7A830A1 /* AppIcon60x60@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 68F25AAE505B315DC4C81E05 /* AppIcon60x60@3x.png */; };
+		DE67B5FC336BA4E91ACB7B69 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = E9E3A9C091FFAC5D1E8E9200 /* Sentry */; };
+		DEE918218BDE5D06D709B4B2 /* TabataWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ADC9BAC21B7870EC0662908 /* TabataWatchApp.swift */; };
+		E3FCF886FE902BE4385C8941 /* TabataCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F912AE2F2AFC514D8D313A1C /* TabataCoreTests.swift */; };
+		E5C8637C729576222BB43261 /* TabataLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596FAD23075F8ECDE5D6EC0D /* TabataLiveActivityWidget.swift */; };
+		EDB9EE97EC91350B462347FF /* Tabata Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A5959BC8ECBAAC55F7B10ADD /* Tabata Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FA2A9F768478CC3DB10F7E6C /* PhoneConnectivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5915982E233F68B35566842E /* PhoneConnectivity.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		041726B067ADA081E42D38FB /* PBXContainerItemProxy */ = {
+		59D147B5315F4D1136DFC7A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 939FCB8FF58CE45037821062 /* Project object */;
+			containerPortal = 9C7B1B5DF5A2BBB34C24A023 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = EBAD77D5906E67E99D45C470;
-			remoteInfo = "Tabata Live Activity";
-		};
-		E991D126DC8F3FEEB3814A22 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 939FCB8FF58CE45037821062 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 613D671CB28947B74CE93A40;
+			remoteGlobalIDString = 87FB9805CDF5563D5B2856A3;
 			remoteInfo = "Tabata Watch App";
+		};
+		5FF79E50358E31977314A15B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9C7B1B5DF5A2BBB34C24A023 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 27BC1B8BB267EF11ACDB4BF1;
+			remoteInfo = "Tabata Live Activity";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		03D301AC126D5963C7EAFDD1 /* Embed App Extensions */ = {
+		86071F927784B77A3F1537DB /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				594D1523150C3E4E08B4B1A5 /* Tabata Live Activity.appex in Embed App Extensions */,
+				93F93414FF3742BBFE66B3E4 /* Tabata Live Activity.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3E866B39427CF01693BEBF1D /* Embed Watch Content */ = {
+		F944E65F757893B97763C2C9 /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				8E45D7B7D6B73A21A88FCF52 /* Tabata Watch App.app in Embed Watch Content */,
+				EDB9EE97EC91350B462347FF /* Tabata Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -85,146 +87,148 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		020891A08469F63F2E38E7F1 /* PhoneConnectivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhoneConnectivity.swift; path = iOS/PhoneConnectivity.swift; sourceTree = "<group>"; };
-		06B87698F28267CC35A1782C /* Tabata Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tabata Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0DE176F36B3FB7928B65B226 /* TabataLiveActivityWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataLiveActivityWidget.swift; path = LiveActivity/TabataLiveActivityWidget.swift; sourceTree = "<group>"; };
-		1AD3E5FCB6FCB830FC738BC4 /* WatchConnectivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchConnectivity.swift; path = Watch/WatchConnectivity.swift; sourceTree = "<group>"; };
-		255890EB215091AF52FF94A8 /* AppIcon60x60@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIcon60x60@3x.png"; path = "Resources/AppIcon60x60@3x.png"; sourceTree = "<group>"; };
-		2CF5BEADBEB3D2463B75F08D /* WatchContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchContentView.swift; path = Watch/WatchContentView.swift; sourceTree = "<group>"; };
-		3F24BEBC0F0D17D7E301192B /* AppIconBeta76x76@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIconBeta76x76@2x~ipad.png"; path = "Resources/AppIconBeta76x76@2x~ipad.png"; sourceTree = "<group>"; };
-		43174E45FFFAE2DE6A9CE67C /* TabataTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabataTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		44614CC10B9F4BFFB2B668D1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		4972C6D86861CE0841537260 /* Tabata Live Activity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Tabata Live Activity.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		54DDFC7B3007EBFFE2FE4835 /* AppIcon83.5x83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIcon83.5x83.5@2x~ipad.png"; path = "Resources/AppIcon83.5x83.5@2x~ipad.png"; sourceTree = "<group>"; };
-		63EE6E9B552891CA90745A9C /* AppIconBeta83.5x83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIconBeta83.5x83.5@2x~ipad.png"; path = "Resources/AppIconBeta83.5x83.5@2x~ipad.png"; sourceTree = "<group>"; };
-		710A06EC31FEBE08D115E52B /* AppIconBeta60x60@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIconBeta60x60@3x.png"; path = "Resources/AppIconBeta60x60@3x.png"; sourceTree = "<group>"; };
-		711487A00D6808CEDC275730 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7AFA6EC84A51B74710075751 /* TabataLiveActivityController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataLiveActivityController.swift; path = iOS/TabataLiveActivityController.swift; sourceTree = "<group>"; };
-		7FF16059BCD13603E295749A /* TabataLiveActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataLiveActivityAttributes.swift; path = LiveActivity/TabataLiveActivityAttributes.swift; sourceTree = "<group>"; };
-		91B266DFCEAD88AD23A1C718 /* WatchWorkoutViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchWorkoutViewModel.swift; path = Watch/WatchWorkoutViewModel.swift; sourceTree = "<group>"; };
-		96EBA8B17EBE142C3760DFC9 /* AppIcon60x60@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIcon60x60@2x.png"; path = "Resources/AppIcon60x60@2x.png"; sourceTree = "<group>"; };
-		9AFBB4673D28A5DC43FFFAA7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		9DBEA4C4E98E62B88C578C3B /* Tabata.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tabata.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A181AB9D094D5B0843BA81A7 /* TabataCore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataCore.swift; path = Shared/TabataCore.swift; sourceTree = "<group>"; };
-		AB011EEE467285D00BF42201 /* AppIconBeta60x60@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIconBeta60x60@2x.png"; path = "Resources/AppIconBeta60x60@2x.png"; sourceTree = "<group>"; };
-		B7E57FC2FD59DDFAEDFE0FBC /* TabataApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataApp.swift; path = iOS/TabataApp.swift; sourceTree = "<group>"; };
-		C2735BC1F933ED6ACDD96D23 /* TabataWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataWatchApp.swift; path = Watch/TabataWatchApp.swift; sourceTree = "<group>"; };
-		DDA1D64307D82063193EB719 /* WorkoutViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WorkoutViewModel.swift; path = iOS/WorkoutViewModel.swift; sourceTree = "<group>"; };
-		E8B066FCF00C5E489E239D89 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		E9FC0D5DD60A7A324FBF662B /* TabataCoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataCoreTests.swift; path = Tests/TabataCoreTests.swift; sourceTree = "<group>"; };
-		EB5036EBA53684BFEBF001CA /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = iOS/ContentView.swift; sourceTree = "<group>"; };
-		F1A06C3ED500A23C6B12479A /* AppIcon76x76@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIcon76x76@2x~ipad.png"; path = "Resources/AppIcon76x76@2x~ipad.png"; sourceTree = "<group>"; };
+		040BB7F1D4BBC03E7D14CF77 /* TabataLiveActivityIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataLiveActivityIntents.swift; path = LiveActivity/TabataLiveActivityIntents.swift; sourceTree = "<group>"; };
+		08DEE9D97C28D8104B9B2401 /* AppIcon60x60@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIcon60x60@2x.png"; path = "Resources/AppIcon60x60@2x.png"; sourceTree = "<group>"; };
+		09119116B79D3EF4533083E0 /* AppIcon83.5x83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIcon83.5x83.5@2x~ipad.png"; path = "Resources/AppIcon83.5x83.5@2x~ipad.png"; sourceTree = "<group>"; };
+		1CB1C2DE165F9310348DFAA8 /* Tabata.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tabata.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		256665F49E144ED7AD433FA5 /* AppIconBeta83.5x83.5@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIconBeta83.5x83.5@2x~ipad.png"; path = "Resources/AppIconBeta83.5x83.5@2x~ipad.png"; sourceTree = "<group>"; };
+		27A1AD4BAB59E47F7422C68B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		2A2390AA38876928DB841673 /* WatchWorkoutViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchWorkoutViewModel.swift; path = Watch/WatchWorkoutViewModel.swift; sourceTree = "<group>"; };
+		2ADC9BAC21B7870EC0662908 /* TabataWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataWatchApp.swift; path = Watch/TabataWatchApp.swift; sourceTree = "<group>"; };
+		2F728CFD3DAA2FC132D691E2 /* WatchConnectivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchConnectivity.swift; path = Watch/WatchConnectivity.swift; sourceTree = "<group>"; };
+		5915982E233F68B35566842E /* PhoneConnectivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhoneConnectivity.swift; path = iOS/PhoneConnectivity.swift; sourceTree = "<group>"; };
+		596FAD23075F8ECDE5D6EC0D /* TabataLiveActivityWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataLiveActivityWidget.swift; path = LiveActivity/TabataLiveActivityWidget.swift; sourceTree = "<group>"; };
+		68F25AAE505B315DC4C81E05 /* AppIcon60x60@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIcon60x60@3x.png"; path = "Resources/AppIcon60x60@3x.png"; sourceTree = "<group>"; };
+		72F62E7CF95A40431B0C36F4 /* WatchContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchContentView.swift; path = Watch/WatchContentView.swift; sourceTree = "<group>"; };
+		743B6F776DF9B8BC5794812E /* TabataLiveActivityController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataLiveActivityController.swift; path = iOS/TabataLiveActivityController.swift; sourceTree = "<group>"; };
+		86392553BFD21EED14DC6CFC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		9231C20E948F812A4D98ADB2 /* AppIconBeta60x60@2x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIconBeta60x60@2x.png"; path = "Resources/AppIconBeta60x60@2x.png"; sourceTree = "<group>"; };
+		9B64A3A71C3BB453BD053B54 /* TabataLiveActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataLiveActivityAttributes.swift; path = LiveActivity/TabataLiveActivityAttributes.swift; sourceTree = "<group>"; };
+		A24060DAD6C5914238779F3C /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A5959BC8ECBAAC55F7B10ADD /* Tabata Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tabata Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9D8DD7FA3B948018DDF431D /* AppIconBeta76x76@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIconBeta76x76@2x~ipad.png"; path = "Resources/AppIconBeta76x76@2x~ipad.png"; sourceTree = "<group>"; };
+		AC41E38387EAFDE72C4CCCDF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		AE9FEF34F45EB40CC016E073 /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = iOS/ContentView.swift; sourceTree = "<group>"; };
+		C2640F901B92AC89399019E3 /* WorkoutViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WorkoutViewModel.swift; path = iOS/WorkoutViewModel.swift; sourceTree = "<group>"; };
+		CC36060F1A37FB24F1BF18AF /* AppIcon76x76@2x~ipad.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIcon76x76@2x~ipad.png"; path = "Resources/AppIcon76x76@2x~ipad.png"; sourceTree = "<group>"; };
+		D3E07EA031D4A112A8AA4736 /* TabataCore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataCore.swift; path = Shared/TabataCore.swift; sourceTree = "<group>"; };
+		D690F3F932478C11D39AF57B /* TabataApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataApp.swift; path = iOS/TabataApp.swift; sourceTree = "<group>"; };
+		E0BAF5BE918A031D6CF07124 /* Tabata Live Activity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Tabata Live Activity.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E144739E8365CF97A8947EBB /* TabataTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabataTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F912AE2F2AFC514D8D313A1C /* TabataCoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TabataCoreTests.swift; path = Tests/TabataCoreTests.swift; sourceTree = "<group>"; };
+		FB869D8A53973ED82BD338DB /* AppIconBeta60x60@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "AppIconBeta60x60@3x.png"; path = "Resources/AppIconBeta60x60@3x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		65AA7AA1C40593BD64D94F38 /* Frameworks */ = {
+		12BFED76077FB2E10BEFA3FF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5F27255A40D51DB058ECC9EE /* Foundation.framework in Frameworks */,
+				A5890A44EA40940609A02D64 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		6D2F5182F5983E925A70F803 /* Frameworks */ = {
+		512835A7891C35A2579CA262 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5B909E05B07A4F44E2BDE555 /* Foundation.framework in Frameworks */,
+				325EE723220E9E3E162EDE85 /* Foundation.framework in Frameworks */,
+				DE67B5FC336BA4E91ACB7B69 /* Sentry in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B7A5362DF23A475CC450C963 /* Frameworks */ = {
+		8900F50D40E3448C8979357F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FFFE59FE0B624C81DD08630 /* Foundation.framework in Frameworks */,
-				2FA1B1C006C1AD5F5B5C51D8 /* Sentry in Frameworks */,
+				1CA8ED9FB461679AB0739BE3 /* Cocoa.framework in Frameworks */,
+				152ADF15DA12FC412629B82A /* TabataCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EBDC05470EB0FBA1701E4F39 /* Frameworks */ = {
+		CE53231B6885246027445038 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E22AD86E3BFFF789A47931DC /* Cocoa.framework in Frameworks */,
-				9039D2F401AF18C6EB879DAD /* TabataCore in Frameworks */,
+				25764BF44E4F207BC7DCE0E4 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		02127A744A8180B71146EB35 /* Frameworks */ = {
+		06C57ED60AA57FEB2FC14BA8 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				AE696E970BE0F8B5454DE2B2 /* iOS */,
-				D2E6115EEF91FDEE25E021E9 /* watchOS */,
-				2C6D976696BE3950B92A817C /* OS X */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		2C6D976696BE3950B92A817C /* OS X */ = {
-			isa = PBXGroup;
-			children = (
-				E8B066FCF00C5E489E239D89 /* Cocoa.framework */,
-			);
-			name = "OS X";
-			sourceTree = "<group>";
-		};
-		39B927698F46E250BF7D7F73 = {
-			isa = PBXGroup;
-			children = (
-				4B244DBE7FDE46FF72FEFDD8 /* Products */,
-				02127A744A8180B71146EB35 /* Frameworks */,
-				A181AB9D094D5B0843BA81A7 /* TabataCore.swift */,
-				B7E57FC2FD59DDFAEDFE0FBC /* TabataApp.swift */,
-				EB5036EBA53684BFEBF001CA /* ContentView.swift */,
-				DDA1D64307D82063193EB719 /* WorkoutViewModel.swift */,
-				020891A08469F63F2E38E7F1 /* PhoneConnectivity.swift */,
-				7AFA6EC84A51B74710075751 /* TabataLiveActivityController.swift */,
-				7FF16059BCD13603E295749A /* TabataLiveActivityAttributes.swift */,
-				C2735BC1F933ED6ACDD96D23 /* TabataWatchApp.swift */,
-				2CF5BEADBEB3D2463B75F08D /* WatchContentView.swift */,
-				91B266DFCEAD88AD23A1C718 /* WatchWorkoutViewModel.swift */,
-				1AD3E5FCB6FCB830FC738BC4 /* WatchConnectivity.swift */,
-				0DE176F36B3FB7928B65B226 /* TabataLiveActivityWidget.swift */,
-				E9FC0D5DD60A7A324FBF662B /* TabataCoreTests.swift */,
-				711487A00D6808CEDC275730 /* Assets.xcassets */,
-				96EBA8B17EBE142C3760DFC9 /* AppIcon60x60@2x.png */,
-				255890EB215091AF52FF94A8 /* AppIcon60x60@3x.png */,
-				F1A06C3ED500A23C6B12479A /* AppIcon76x76@2x~ipad.png */,
-				54DDFC7B3007EBFFE2FE4835 /* AppIcon83.5x83.5@2x~ipad.png */,
-				AB011EEE467285D00BF42201 /* AppIconBeta60x60@2x.png */,
-				710A06EC31FEBE08D115E52B /* AppIconBeta60x60@3x.png */,
-				3F24BEBC0F0D17D7E301192B /* AppIconBeta76x76@2x~ipad.png */,
-				63EE6E9B552891CA90745A9C /* AppIconBeta83.5x83.5@2x~ipad.png */,
-			);
-			sourceTree = "<group>";
-		};
-		4B244DBE7FDE46FF72FEFDD8 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				9DBEA4C4E98E62B88C578C3B /* Tabata.app */,
-				06B87698F28267CC35A1782C /* Tabata Watch App.app */,
-				4972C6D86861CE0841537260 /* Tabata Live Activity.appex */,
-				43174E45FFFAE2DE6A9CE67C /* TabataTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		AE696E970BE0F8B5454DE2B2 /* iOS */ = {
-			isa = PBXGroup;
-			children = (
-				44614CC10B9F4BFFB2B668D1 /* Foundation.framework */,
+				86392553BFD21EED14DC6CFC /* Foundation.framework */,
 			);
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		D2E6115EEF91FDEE25E021E9 /* watchOS */ = {
+		13A0C39BBB0A5644A5CEDF11 = {
 			isa = PBXGroup;
 			children = (
-				9AFBB4673D28A5DC43FFFAA7 /* Foundation.framework */,
+				2D06C79F8289AF23F5252D35 /* Products */,
+				1E387AB320FAA785688F8D60 /* Frameworks */,
+				D3E07EA031D4A112A8AA4736 /* TabataCore.swift */,
+				D690F3F932478C11D39AF57B /* TabataApp.swift */,
+				AE9FEF34F45EB40CC016E073 /* ContentView.swift */,
+				C2640F901B92AC89399019E3 /* WorkoutViewModel.swift */,
+				5915982E233F68B35566842E /* PhoneConnectivity.swift */,
+				743B6F776DF9B8BC5794812E /* TabataLiveActivityController.swift */,
+				9B64A3A71C3BB453BD053B54 /* TabataLiveActivityAttributes.swift */,
+				040BB7F1D4BBC03E7D14CF77 /* TabataLiveActivityIntents.swift */,
+				2ADC9BAC21B7870EC0662908 /* TabataWatchApp.swift */,
+				72F62E7CF95A40431B0C36F4 /* WatchContentView.swift */,
+				2A2390AA38876928DB841673 /* WatchWorkoutViewModel.swift */,
+				2F728CFD3DAA2FC132D691E2 /* WatchConnectivity.swift */,
+				596FAD23075F8ECDE5D6EC0D /* TabataLiveActivityWidget.swift */,
+				F912AE2F2AFC514D8D313A1C /* TabataCoreTests.swift */,
+				A24060DAD6C5914238779F3C /* Assets.xcassets */,
+				08DEE9D97C28D8104B9B2401 /* AppIcon60x60@2x.png */,
+				68F25AAE505B315DC4C81E05 /* AppIcon60x60@3x.png */,
+				CC36060F1A37FB24F1BF18AF /* AppIcon76x76@2x~ipad.png */,
+				09119116B79D3EF4533083E0 /* AppIcon83.5x83.5@2x~ipad.png */,
+				9231C20E948F812A4D98ADB2 /* AppIconBeta60x60@2x.png */,
+				FB869D8A53973ED82BD338DB /* AppIconBeta60x60@3x.png */,
+				A9D8DD7FA3B948018DDF431D /* AppIconBeta76x76@2x~ipad.png */,
+				256665F49E144ED7AD433FA5 /* AppIconBeta83.5x83.5@2x~ipad.png */,
+			);
+			sourceTree = "<group>";
+		};
+		1E387AB320FAA785688F8D60 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				06C57ED60AA57FEB2FC14BA8 /* iOS */,
+				F1D031B412F46B9F31C78A9B /* watchOS */,
+				560B316E49974DD6729C8646 /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2D06C79F8289AF23F5252D35 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1CB1C2DE165F9310348DFAA8 /* Tabata.app */,
+				A5959BC8ECBAAC55F7B10ADD /* Tabata Watch App.app */,
+				E0BAF5BE918A031D6CF07124 /* Tabata Live Activity.appex */,
+				E144739E8365CF97A8947EBB /* TabataTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		560B316E49974DD6729C8646 /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				27A1AD4BAB59E47F7422C68B /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		F1D031B412F46B9F31C78A9B /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				AC41E38387EAFDE72C4CCCDF /* Foundation.framework */,
 			);
 			name = watchOS;
 			sourceTree = "<group>";
@@ -232,13 +236,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		21076B7C31DCE35C8763FCD4 /* TabataTests */ = {
+		038ADF3366E12CFA871EC5F0 /* TabataTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C86B45D87A5185E448496109 /* Build configuration list for PBXNativeTarget "TabataTests" */;
+			buildConfigurationList = 663A576D33942F31BD94B6AB /* Build configuration list for PBXNativeTarget "TabataTests" */;
 			buildPhases = (
-				C3AFB1C364DAF8030E19BDDE /* Sources */,
-				EBDC05470EB0FBA1701E4F39 /* Frameworks */,
-				B5255FD10E4A71FC5E0AC844 /* Resources */,
+				0B29C074AC9571B82C718257 /* Sources */,
+				8900F50D40E3448C8979357F /* Frameworks */,
+				D82EF0508773C3EAEFEE2CDE /* Resources */,
 			);
 			buildRules = (
 			);
@@ -246,60 +250,43 @@
 			);
 			name = TabataTests;
 			packageProductDependencies = (
-				A951EB864417AE8F8936A7A2 /* TabataCore */,
+				6F2C641927E45A39269A27EF /* TabataCore */,
 			);
 			productName = TabataTests;
-			productReference = 43174E45FFFAE2DE6A9CE67C /* TabataTests.xctest */;
+			productReference = E144739E8365CF97A8947EBB /* TabataTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		613D671CB28947B74CE93A40 /* Tabata Watch App */ = {
+		23811C4C1DC5B5DD3758EFEE /* Tabata */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 18170D74B0FC066B10A314F6 /* Build configuration list for PBXNativeTarget "Tabata Watch App" */;
+			buildConfigurationList = DB6E20066FA0D1EDD2C520C9 /* Build configuration list for PBXNativeTarget "Tabata" */;
 			buildPhases = (
-				014404D8E44B0F6E5D86C887 /* Sources */,
-				6D2F5182F5983E925A70F803 /* Frameworks */,
-				CEB0BF168B81E26FCA6AD8A3 /* Resources */,
+				A83D413599F74F8C8C1D97AE /* Sources */,
+				512835A7891C35A2579CA262 /* Frameworks */,
+				23028F9325E7C1069278FFA4 /* Resources */,
+				F944E65F757893B97763C2C9 /* Embed Watch Content */,
+				86071F927784B77A3F1537DB /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-			);
-			name = "Tabata Watch App";
-			productName = "Tabata Watch App";
-			productReference = 06B87698F28267CC35A1782C /* Tabata Watch App.app */;
-			productType = "com.apple.product-type.application";
-		};
-		7C2B0992D59DE4E93A74C912 /* Tabata */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E44CB443C6C242550438026A /* Build configuration list for PBXNativeTarget "Tabata" */;
-			buildPhases = (
-				FB1475A870DB709136708428 /* Sources */,
-				B7A5362DF23A475CC450C963 /* Frameworks */,
-				0EE3A3544822C91F0017FCE9 /* Resources */,
-				3E866B39427CF01693BEBF1D /* Embed Watch Content */,
-				03D301AC126D5963C7EAFDD1 /* Embed App Extensions */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				C8A2C646F1FBFB4EAFB81672 /* PBXTargetDependency */,
-				8D255FE17C709A78BA72E13F /* PBXTargetDependency */,
+				80DA88DCF112B280236FC431 /* PBXTargetDependency */,
+				B9ECD33E71C2CE4BC5D2F7B1 /* PBXTargetDependency */,
 			);
 			name = Tabata;
 			packageProductDependencies = (
-				A15C24469C5F141672684C6A /* Sentry */,
+				E9E3A9C091FFAC5D1E8E9200 /* Sentry */,
 			);
 			productName = Tabata;
-			productReference = 9DBEA4C4E98E62B88C578C3B /* Tabata.app */;
+			productReference = 1CB1C2DE165F9310348DFAA8 /* Tabata.app */;
 			productType = "com.apple.product-type.application";
 		};
-		EBAD77D5906E67E99D45C470 /* Tabata Live Activity */ = {
+		27BC1B8BB267EF11ACDB4BF1 /* Tabata Live Activity */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 89C2C287C379FBDC02EC210E /* Build configuration list for PBXNativeTarget "Tabata Live Activity" */;
+			buildConfigurationList = D16F4ACA073C27DD11FE5701 /* Build configuration list for PBXNativeTarget "Tabata Live Activity" */;
 			buildPhases = (
-				A1FFBB0985925F7D13B85DB8 /* Sources */,
-				65AA7AA1C40593BD64D94F38 /* Frameworks */,
-				4CB01F96E61D4E3628F949C5 /* Resources */,
+				DDA82D4119B822099A587DAE /* Sources */,
+				12BFED76077FB2E10BEFA3FF /* Frameworks */,
+				4C21D3528B1127100436177B /* Resources */,
 			);
 			buildRules = (
 			);
@@ -307,19 +294,36 @@
 			);
 			name = "Tabata Live Activity";
 			productName = "Tabata Live Activity";
-			productReference = 4972C6D86861CE0841537260 /* Tabata Live Activity.appex */;
+			productReference = E0BAF5BE918A031D6CF07124 /* Tabata Live Activity.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		87FB9805CDF5563D5B2856A3 /* Tabata Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A10E868FDB02467813D8770 /* Build configuration list for PBXNativeTarget "Tabata Watch App" */;
+			buildPhases = (
+				6E3DACA2A3212135FBDA0AD6 /* Sources */,
+				CE53231B6885246027445038 /* Frameworks */,
+				41393B4AB6C3C0B1CC16A12F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Tabata Watch App";
+			productName = "Tabata Watch App";
+			productReference = A5959BC8ECBAAC55F7B10ADD /* Tabata Watch App.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		939FCB8FF58CE45037821062 /* Project object */ = {
+		9C7B1B5DF5A2BBB34C24A023 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 			};
-			buildConfigurationList = CD79A7BD5A26090B483EC7B7 /* Build configuration list for PBXProject "Tabata" */;
+			buildConfigurationList = BF9FDA241E877C02B43A0E0B /* Build configuration list for PBXProject "Tabata" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -327,129 +331,175 @@
 				en,
 				Base,
 			);
-			mainGroup = 39B927698F46E250BF7D7F73;
+			mainGroup = 13A0C39BBB0A5644A5CEDF11;
 			minimizedProjectReferenceProxies = 0;
 			packageReferences = (
-				7A78793D218B2C46ECC20A83 /* XCLocalSwiftPackageReference "." */,
-				9298E6C578B5F88EF440B1F5 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				8C462B916DFF19B2FBDB61DD /* XCLocalSwiftPackageReference "." */,
+				2CFAAA38DD2BD1D2D24B3920 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 4B244DBE7FDE46FF72FEFDD8 /* Products */;
+			productRefGroup = 2D06C79F8289AF23F5252D35 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7C2B0992D59DE4E93A74C912 /* Tabata */,
-				613D671CB28947B74CE93A40 /* Tabata Watch App */,
-				EBAD77D5906E67E99D45C470 /* Tabata Live Activity */,
-				21076B7C31DCE35C8763FCD4 /* TabataTests */,
+				23811C4C1DC5B5DD3758EFEE /* Tabata */,
+				87FB9805CDF5563D5B2856A3 /* Tabata Watch App */,
+				27BC1B8BB267EF11ACDB4BF1 /* Tabata Live Activity */,
+				038ADF3366E12CFA871EC5F0 /* TabataTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		0EE3A3544822C91F0017FCE9 /* Resources */ = {
+		23028F9325E7C1069278FFA4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0EFCE2F45A7BA0244786F057 /* Assets.xcassets in Resources */,
-				2AFE02C656A13D1E36523B54 /* AppIcon60x60@2x.png in Resources */,
-				FE6788A487C41F903534D9A5 /* AppIcon60x60@3x.png in Resources */,
-				183D7B11CB451433C4110224 /* AppIcon76x76@2x~ipad.png in Resources */,
-				4ECE79266A364BB7E5BC4E7A /* AppIcon83.5x83.5@2x~ipad.png in Resources */,
-				527A37CDEDD78F01808B3000 /* AppIconBeta60x60@2x.png in Resources */,
-				5A75B0ACBBE577C0BB8A71DE /* AppIconBeta60x60@3x.png in Resources */,
-				E200C6B74333206B556941FC /* AppIconBeta76x76@2x~ipad.png in Resources */,
-				6CE5A40828BA588F5744DCB4 /* AppIconBeta83.5x83.5@2x~ipad.png in Resources */,
+				12F05EFC4AE5E3D219B9A66C /* Assets.xcassets in Resources */,
+				94593CF8C44550992DE5D2FD /* AppIcon60x60@2x.png in Resources */,
+				DB9416F6F39A8BF8B7A830A1 /* AppIcon60x60@3x.png in Resources */,
+				83DD953A346FA52EE7E5D65E /* AppIcon76x76@2x~ipad.png in Resources */,
+				BAEEBFD702F27E131CD79F6F /* AppIcon83.5x83.5@2x~ipad.png in Resources */,
+				24062B8D9DEB9A964C0542FF /* AppIconBeta60x60@2x.png in Resources */,
+				AF5230DE8ADF97604C09E85A /* AppIconBeta60x60@3x.png in Resources */,
+				3F93737FC8F787C102777252 /* AppIconBeta76x76@2x~ipad.png in Resources */,
+				961AF8E3C4D4949E805BE78F /* AppIconBeta83.5x83.5@2x~ipad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CB01F96E61D4E3628F949C5 /* Resources */ = {
+		41393B4AB6C3C0B1CC16A12F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9D439FE1DF2DBE9051DBB38E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4C21D3528B1127100436177B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B5255FD10E4A71FC5E0AC844 /* Resources */ = {
+		D82EF0508773C3EAEFEE2CDE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		CEB0BF168B81E26FCA6AD8A3 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3A53B162FF32C9243B73D93A /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		014404D8E44B0F6E5D86C887 /* Sources */ = {
+		0B29C074AC9571B82C718257 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				420B1CC4A936E475FB64BBDC /* TabataCore.swift in Sources */,
-				7D11391A867199B4EC3AB854 /* TabataWatchApp.swift in Sources */,
-				3962C555C1DE0862B0E8F233 /* WatchContentView.swift in Sources */,
-				29A77BF7843DAC84A639C41F /* WatchWorkoutViewModel.swift in Sources */,
-				450612816A67A3A5C48E2213 /* WatchConnectivity.swift in Sources */,
+				E3FCF886FE902BE4385C8941 /* TabataCoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A1FFBB0985925F7D13B85DB8 /* Sources */ = {
+		6E3DACA2A3212135FBDA0AD6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				42BCD991965502239B5761D2 /* TabataLiveActivityAttributes.swift in Sources */,
-				C2746D57B257D056D9C08C40 /* TabataLiveActivityWidget.swift in Sources */,
+				CA598BEA42F6BEC7B30C8B83 /* TabataCore.swift in Sources */,
+				DEE918218BDE5D06D709B4B2 /* TabataWatchApp.swift in Sources */,
+				8F8828F93402DC5A7B6EC161 /* WatchContentView.swift in Sources */,
+				BB930929072D552DB1226B70 /* WatchWorkoutViewModel.swift in Sources */,
+				937FB00064FC976140947140 /* WatchConnectivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C3AFB1C364DAF8030E19BDDE /* Sources */ = {
+		A83D413599F74F8C8C1D97AE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1434E8F2E257784FD362890A /* TabataCoreTests.swift in Sources */,
+				C1239DF9FBF9A9C4F6FD5054 /* TabataCore.swift in Sources */,
+				B6298BC01B2F3C911A1F10F6 /* TabataApp.swift in Sources */,
+				086FCFB91C19EC0B7003879B /* ContentView.swift in Sources */,
+				A883BC3A61DC210DD16F3490 /* WorkoutViewModel.swift in Sources */,
+				FA2A9F768478CC3DB10F7E6C /* PhoneConnectivity.swift in Sources */,
+				66A4BDC58B172FCB46A00BDF /* TabataLiveActivityController.swift in Sources */,
+				B9394F8EE54E9EDBBF4B9AB1 /* TabataLiveActivityAttributes.swift in Sources */,
+				BAD781E3543B92A4DB932C87 /* TabataLiveActivityIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FB1475A870DB709136708428 /* Sources */ = {
+		DDA82D4119B822099A587DAE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				17166A775BF25E4B60B97546 /* TabataCore.swift in Sources */,
-				FD5A3717E70BD75150D9FC5D /* TabataApp.swift in Sources */,
-				BC77F927D92849B470E81056 /* ContentView.swift in Sources */,
-				A3105471008B7EF88BDE9A40 /* WorkoutViewModel.swift in Sources */,
-				0BE60BEB3ED6DE5A8B3066E9 /* PhoneConnectivity.swift in Sources */,
-				E9F51446F7BE386A02128B19 /* TabataLiveActivityController.swift in Sources */,
-				F14B87B92341632A8CA657DA /* TabataLiveActivityAttributes.swift in Sources */,
+				CAD4FF4D7CEBBB395A759B0C /* TabataLiveActivityAttributes.swift in Sources */,
+				56DC7715B823A13D9F2D4315 /* TabataLiveActivityIntents.swift in Sources */,
+				E5C8637C729576222BB43261 /* TabataLiveActivityWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		8D255FE17C709A78BA72E13F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "Tabata Live Activity";
-			target = EBAD77D5906E67E99D45C470 /* Tabata Live Activity */;
-			targetProxy = 041726B067ADA081E42D38FB /* PBXContainerItemProxy */;
-		};
-		C8A2C646F1FBFB4EAFB81672 /* PBXTargetDependency */ = {
+		80DA88DCF112B280236FC431 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Tabata Watch App";
-			target = 613D671CB28947B74CE93A40 /* Tabata Watch App */;
-			targetProxy = E991D126DC8F3FEEB3814A22 /* PBXContainerItemProxy */;
+			target = 87FB9805CDF5563D5B2856A3 /* Tabata Watch App */;
+			targetProxy = 59D147B5315F4D1136DFC7A2 /* PBXContainerItemProxy */;
+		};
+		B9ECD33E71C2CE4BC5D2F7B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Tabata Live Activity";
+			target = 27BC1B8BB267EF11ACDB4BF1 /* Tabata Live Activity */;
+			targetProxy = 5FF79E50358E31977314A15B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		2747C11B0E08430217C4D8D3 /* Beta */ = {
+		0575085C96D3DFF0FA929A50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8G4H6268W7;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Watch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Tabata Ticker";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.merimerimeri.tabataticker;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "$(WATCH_PROFILE_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = watchos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		06A77AF086836FD27FC5799B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8G4H6268W7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
+		203FA81921393B77C1ACAE57 /* Beta */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconBeta;
@@ -474,13 +524,53 @@
 				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABATA_APP";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Beta;
 		};
-		368C3B2FF5AE14A10494D507 /* Release */ = {
+		26A94D815D514EE0BB8DBDB3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8G4H6268W7;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.liveactivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphonesimulator;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = iphonesimulator;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2EDA35039BA29B83A29EC673 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8G4H6268W7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.beta.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "";
+			};
+			name = Beta;
+		};
+		7977F5FDB4B17D810923B285 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -534,7 +624,7 @@
 			};
 			name = Release;
 		};
-		3954BBD2E056B3B7294E6722 /* Debug */ = {
+		8BFC42792B4FC9E82D976CA5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -557,7 +647,51 @@
 			};
 			name = Debug;
 		};
-		5A931B765C95EADA60314B5C /* Release */ = {
+		94DF36C0784D5A3B4CAB93DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8G4H6268W7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "";
+			};
+			name = Release;
+		};
+		972DCB046DF9F57221887885 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconBeta;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8G4H6268W7;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Watch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Tabata Ticker";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.merimerimeri.tabataticker.beta;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.beta.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "$(WATCH_PROFILE_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = watchos;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Beta;
+		};
+		9B4EF847E4A6F6C9CA72F529 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -582,7 +716,7 @@
 			};
 			name = Release;
 		};
-		85D56D5F009226DDDF9BA308 /* Release */ = {
+		A267FB27E46B0BB68FEF587A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -607,30 +741,93 @@
 				SUPPORTED_PLATFORMS = iphoneos;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABATA_APP";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		9B0237D30F22670999F66698 /* Debug */ = {
+		B02BFD2D00B76C32FBDB8769 /* Beta */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.beta.liveactivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
+				PROVISIONING_PROFILE_SPECIFIER = "$(LIVE_ACTIVITY_PROFILE_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = iphoneos;
 				SWIFT_VERSION = 6.0;
-				TEST_HOST = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
-			name = Debug;
+			name = Beta;
 		};
-		B4C880EDA15C1E356D4DB6AB /* Debug */ = {
+		B50BC3BE11A0A45D83A04B01 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Beta;
+		};
+		BD7CFCD6D556B0AF8AED7BD7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -691,196 +888,7 @@
 			};
 			name = Debug;
 		};
-		C440D2B78CE635ED1AAC8D5E /* Beta */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = LiveActivity/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.beta.liveactivity;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "$(LIVE_ACTIVITY_PROFILE_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = iphoneos;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Beta;
-		};
-		C461B8EB75F08A7B30E39A5F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_VERSION = 6.0;
-				TEST_HOST = "";
-			};
-			name = Release;
-		};
-		C5555A64AD4CE049F6125B51 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = LiveActivity/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.liveactivity;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphonesimulator;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = iphonesimulator;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		D7234C43DD5E78689EAAFB48 /* Beta */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Beta;
-		};
-		DFCF00B04F901850DDCDECD3 /* Beta */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconBeta;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Watch/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Tabata Ticker";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.merimerimeri.tabataticker.beta;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.beta.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "$(WATCH_PROFILE_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = watchos;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
-			};
-			name = Beta;
-		};
-		EAD31140CA1E4C9E6577633C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Watch/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Tabata Ticker";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.merimerimeri.tabataticker;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "$(WATCH_PROFILE_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = watchos;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
-			};
-			name = Release;
-		};
-		EFC016EFA85AC7225A6F59C7 /* Beta */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8G4H6268W7;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.merimerimeri.tabataticker.beta.tests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_VERSION = 6.0;
-				TEST_HOST = "";
-			};
-			name = Beta;
-		};
-		F0045819AB0EE8DECF64D033 /* Debug */ = {
+		CE2DFB66A178486FB2D99677 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -902,6 +910,7 @@
 				SUPPORTED_PLATFORMS = iphonesimulator;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) TABATA_APP";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -910,52 +919,52 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		18170D74B0FC066B10A314F6 /* Build configuration list for PBXNativeTarget "Tabata Watch App" */ = {
+		663A576D33942F31BD94B6AB /* Build configuration list for PBXNativeTarget "TabataTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				EAD31140CA1E4C9E6577633C /* Release */,
-				3954BBD2E056B3B7294E6722 /* Debug */,
-				DFCF00B04F901850DDCDECD3 /* Beta */,
+				94DF36C0784D5A3B4CAB93DE /* Release */,
+				06A77AF086836FD27FC5799B /* Debug */,
+				2EDA35039BA29B83A29EC673 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		89C2C287C379FBDC02EC210E /* Build configuration list for PBXNativeTarget "Tabata Live Activity" */ = {
+		6A10E868FDB02467813D8770 /* Build configuration list for PBXNativeTarget "Tabata Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5A931B765C95EADA60314B5C /* Release */,
-				C5555A64AD4CE049F6125B51 /* Debug */,
-				C440D2B78CE635ED1AAC8D5E /* Beta */,
+				0575085C96D3DFF0FA929A50 /* Release */,
+				8BFC42792B4FC9E82D976CA5 /* Debug */,
+				972DCB046DF9F57221887885 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C86B45D87A5185E448496109 /* Build configuration list for PBXNativeTarget "TabataTests" */ = {
+		BF9FDA241E877C02B43A0E0B /* Build configuration list for PBXProject "Tabata" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C461B8EB75F08A7B30E39A5F /* Release */,
-				9B0237D30F22670999F66698 /* Debug */,
-				EFC016EFA85AC7225A6F59C7 /* Beta */,
+				BD7CFCD6D556B0AF8AED7BD7 /* Debug */,
+				7977F5FDB4B17D810923B285 /* Release */,
+				B50BC3BE11A0A45D83A04B01 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CD79A7BD5A26090B483EC7B7 /* Build configuration list for PBXProject "Tabata" */ = {
+		D16F4ACA073C27DD11FE5701 /* Build configuration list for PBXNativeTarget "Tabata Live Activity" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B4C880EDA15C1E356D4DB6AB /* Debug */,
-				368C3B2FF5AE14A10494D507 /* Release */,
-				D7234C43DD5E78689EAAFB48 /* Beta */,
+				9B4EF847E4A6F6C9CA72F529 /* Release */,
+				26A94D815D514EE0BB8DBDB3 /* Debug */,
+				B02BFD2D00B76C32FBDB8769 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E44CB443C6C242550438026A /* Build configuration list for PBXNativeTarget "Tabata" */ = {
+		DB6E20066FA0D1EDD2C520C9 /* Build configuration list for PBXNativeTarget "Tabata" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				85D56D5F009226DDDF9BA308 /* Release */,
-				F0045819AB0EE8DECF64D033 /* Debug */,
-				2747C11B0E08430217C4D8D3 /* Beta */,
+				A267FB27E46B0BB68FEF587A /* Release */,
+				CE2DFB66A178486FB2D99677 /* Debug */,
+				203FA81921393B77C1ACAE57 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -963,14 +972,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		7A78793D218B2C46ECC20A83 /* XCLocalSwiftPackageReference "." */ = {
+		8C462B916DFF19B2FBDB61DD /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = .;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		9298E6C578B5F88EF440B1F5 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+		2CFAAA38DD2BD1D2D24B3920 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
 			requirement = {
@@ -981,17 +990,17 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A15C24469C5F141672684C6A /* Sentry */ = {
+		6F2C641927E45A39269A27EF /* TabataCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9298E6C578B5F88EF440B1F5 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
-			productName = Sentry;
-		};
-		A951EB864417AE8F8936A7A2 /* TabataCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7A78793D218B2C46ECC20A83 /* XCLocalSwiftPackageReference "." */;
+			package = 8C462B916DFF19B2FBDB61DD /* XCLocalSwiftPackageReference "." */;
 			productName = TabataCore;
+		};
+		E9E3A9C091FFAC5D1E8E9200 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2CFAAA38DD2BD1D2D24B3920 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = 939FCB8FF58CE45037821062 /* Project object */;
+	rootObject = 9C7B1B5DF5A2BBB34C24A023 /* Project object */;
 }

@@ -26,10 +26,6 @@ extension TabataLiveActivityAttributes.ContentState {
         startsAt...max(startsAt.addingTimeInterval(1), endsAt)
     }
 
-    var statusText: String {
-        isRunning ? "Active" : "Paused"
-    }
-
     // Only used while paused; a running phase gets a progress view driven by the same range.
     var pausedFraction: Double {
         let range = timerRange

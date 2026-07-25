@@ -56,7 +56,8 @@ ios_sources = shared_sources + [
   "iOS/WorkoutViewModel.swift",
   "iOS/PhoneConnectivity.swift",
   "iOS/TabataLiveActivityController.swift",
-  "LiveActivity/TabataLiveActivityAttributes.swift"
+  "LiveActivity/TabataLiveActivityAttributes.swift",
+  "LiveActivity/TabataLiveActivityIntents.swift"
 ]
 
 watch_sources = shared_sources + [
@@ -68,6 +69,7 @@ watch_sources = shared_sources + [
 
 live_activity_sources = [
   "LiveActivity/TabataLiveActivityAttributes.swift",
+  "LiveActivity/TabataLiveActivityIntents.swift",
   "LiveActivity/TabataLiveActivityWidget.swift"
 ]
 
@@ -130,6 +132,11 @@ end
 
 ios_target.build_configurations.each do |config|
   settings = config.build_settings
+  # The Live Activity intents are compiled into both the app and the widget extension, but only the
+  # app can act on them, so their bodies are gated on this condition.
+  # $(inherited) keeps the project-level DEBUG condition, which this setting would otherwise replace.
+  conditions = settings["SWIFT_ACTIVE_COMPILATION_CONDITIONS"].to_s.split(" ")
+  settings["SWIFT_ACTIVE_COMPILATION_CONDITIONS"] = (conditions + ["$(inherited)", "TABATA_APP"]).uniq.join(" ")
   settings["GENERATE_INFOPLIST_FILE"] = "NO"
   settings["INFOPLIST_FILE"] = "iOS/Info.plist"
   settings["IPHONEOS_DEPLOYMENT_TARGET"] = "26.0"

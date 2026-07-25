@@ -7,7 +7,7 @@ struct TabataApp: App {
 
     init() {
         Self.startCrashReporting()
-        viewModel = WorkoutViewModel()
+        viewModel = WorkoutViewModel.shared()
         viewModel.activate()
     }
 

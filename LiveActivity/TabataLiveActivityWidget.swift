@@ -1,4 +1,5 @@
 import ActivityKit
+import AppIntents
 import SwiftUI
 import WidgetKit
 
@@ -68,7 +69,7 @@ private struct TabataLiveActivityLockScreenView: View {
                     .background(.white.opacity(0.10), in: Capsule())
             }
 
-            HStack(alignment: .lastTextBaseline, spacing: 12) {
+            HStack(alignment: .center, spacing: 12) {
                 TabataLiveActivityTimerText(state: state)
                     .font(.system(size: 50, weight: .black, design: .rounded))
                     .lineLimit(1)
@@ -76,14 +77,7 @@ private struct TabataLiveActivityLockScreenView: View {
 
                 Spacer(minLength: 12)
 
-                Text(state.statusText)
-                    .font(.caption2.weight(.heavy))
-                    .foregroundStyle(state.tint)
-                    .textCase(.uppercase)
-                    .lineLimit(1)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 5)
-                    .background(state.tint.opacity(0.16), in: Capsule())
+                TabataLiveActivityControls(state: state, height: 40)
             }
 
             TabataLiveActivityProgressBar(state: state, height: 6)
@@ -113,7 +107,7 @@ private struct TabataLiveActivityExpandedView: View {
                     .background(.white.opacity(0.10), in: Capsule())
             }
 
-            HStack(alignment: .lastTextBaseline, spacing: 10) {
+            HStack(alignment: .center, spacing: 10) {
                 TabataLiveActivityTimerText(state: state)
                     .font(.system(size: 43, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
@@ -122,19 +116,43 @@ private struct TabataLiveActivityExpandedView: View {
 
                 Spacer(minLength: 8)
 
-                Text(state.statusText)
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(state.tint)
-                    .textCase(.uppercase)
-                    .lineLimit(1)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(state.tint.opacity(0.16), in: Capsule())
+                TabataLiveActivityControls(state: state, height: 36)
             }
 
             TabataLiveActivityProgressBar(state: state, height: 5)
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+// Tapping these runs the intent in the app process and the app pushes fresh content back, so the
+// button reflects the new state without the widget doing anything itself.
+private struct TabataLiveActivityControls: View {
+    let state: TabataLiveActivityAttributes.ContentState
+    let height: CGFloat
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button(intent: ToggleWorkoutIntent()) {
+                Image(systemName: state.isRunning ? "pause.fill" : "play.fill")
+                    .font(.system(size: height * 0.38, weight: .black))
+                    .foregroundStyle(.white)
+                    .frame(width: height * 1.35, height: height)
+                    .background(.white.opacity(0.18), in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(state.isRunning ? "Pause workout" : "Resume workout")
+
+            Button(intent: EndWorkoutIntent()) {
+                Image(systemName: "xmark")
+                    .font(.system(size: height * 0.34, weight: .black))
+                    .foregroundStyle(.white.opacity(0.9))
+                    .frame(width: height, height: height)
+                    .background(.white.opacity(0.10), in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("End workout")
+        }
     }
 }
 
