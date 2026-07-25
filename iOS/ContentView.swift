@@ -37,6 +37,9 @@ private enum ContentRoute: Hashable {
     }
 }
 
+// Glass controls always sit on a dark phase gradient, so their content stays light.
+private let glassControlForeground = Color.white
+
 struct ContentView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     private let viewModel: WorkoutViewModel
@@ -71,6 +74,7 @@ struct ContentView: View {
             }
         }
         .tint(.white.opacity(0.86))
+        .preferredColorScheme(.dark)
         .onAppear {
             viewModel.activate()
         }
@@ -191,13 +195,7 @@ struct ContentView: View {
                 Button {
                     viewModel.selectPreset(preset)
                 } label: {
-                    Label {
-                        Text(preset.name)
-                            .foregroundStyle(presetControlForeground)
-                    } icon: {
-                        Image(systemName: preset.id == viewModel.selectedPreset.id ? "checkmark" : "timer")
-                            .foregroundStyle(presetControlForeground)
-                    }
+                    Label(preset.name, systemImage: preset.id == viewModel.selectedPreset.id ? "checkmark" : "timer")
                 }
             }
 
@@ -207,13 +205,7 @@ struct ContentView: View {
                 Button {
                     path.append(.createPreset)
                 } label: {
-                    Label {
-                        Text("New Preset")
-                            .foregroundStyle(presetControlForeground)
-                    } icon: {
-                        Image(systemName: "plus")
-                            .foregroundStyle(presetControlForeground)
-                    }
+                    Label("New Preset", systemImage: "plus")
                 }
             }
         } label: {
@@ -232,9 +224,9 @@ struct ContentView: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.glass)
-        .foregroundStyle(presetControlForeground)
-        .tint(presetControlForeground)
+        .foregroundStyle(glassControlForeground)
         .accessibilityLabel("Preset")
+        .accessibilityValue(viewModel.selectedPreset.name)
     }
 
     private var readout: some View {
@@ -342,10 +334,6 @@ struct ContentView: View {
 
     private var backgroundColors: [Color] {
         [Color(presentation.background.start), Color(presentation.background.end)]
-    }
-
-    private var presetControlForeground: Color {
-        Color(red: 0.05, green: 0.22, blue: 0.28)
     }
 
     private var resumeButtonTint: Color {
@@ -573,7 +561,7 @@ private struct PresetSettingsRow: View {
                             .frame(width: 42, height: 42)
                     }
                     .buttonStyle(.glass)
-                    .foregroundStyle(presetActionForeground)
+                    .foregroundStyle(glassControlForeground)
                     .accessibilityLabel("Edit \(preset.name)")
 
                     Button(role: .destructive) {
@@ -584,7 +572,7 @@ private struct PresetSettingsRow: View {
                             .frame(width: 42, height: 42)
                     }
                     .buttonStyle(.glass)
-                    .foregroundStyle(presetActionForeground)
+                    .foregroundStyle(glassControlForeground)
                     .accessibilityLabel("Delete \(preset.name)")
                     .confirmationDialog("Delete preset?", isPresented: $isConfirmingDelete) {
                         Button("Delete \(preset.name)", role: .destructive, action: onDelete)
@@ -609,10 +597,6 @@ private struct PresetSettingsRow: View {
             return "Default"
         }
         return "Custom"
-    }
-
-    private var presetActionForeground: Color {
-        Color(red: 0.05, green: 0.22, blue: 0.28)
     }
 }
 
@@ -791,7 +775,7 @@ private struct PresetValueControl: View {
                         .frame(width: 42, height: 42)
                 }
                 .buttonStyle(.glass)
-                .foregroundStyle(stepperForeground)
+                .foregroundStyle(glassControlForeground)
                 .disabled(decrementDisabled)
                 .accessibilityLabel("Decrease \(title)")
 
@@ -801,15 +785,11 @@ private struct PresetValueControl: View {
                         .frame(width: 42, height: 42)
                 }
                 .buttonStyle(.glass)
-                .foregroundStyle(stepperForeground)
+                .foregroundStyle(glassControlForeground)
                 .disabled(incrementDisabled)
                 .accessibilityLabel("Increase \(title)")
             }
         }
-    }
-
-    private var stepperForeground: Color {
-        Color(red: 0.05, green: 0.22, blue: 0.28)
     }
 }
 
