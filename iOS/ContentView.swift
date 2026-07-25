@@ -78,9 +78,6 @@ struct ContentView: View {
         .onAppear {
             viewModel.activate()
         }
-        .task(id: viewModel.state.isRunning) {
-            await tickWhileRunning()
-        }
     }
 
     @ViewBuilder
@@ -338,18 +335,6 @@ struct ContentView: View {
 
     private var resumeButtonTint: Color {
         Color(red: 0.00, green: 0.48, blue: 0.95)
-    }
-
-    @MainActor
-    private func tickWhileRunning() async {
-        guard viewModel.state.isRunning else {
-            return
-        }
-
-        while !Task.isCancelled, viewModel.state.isRunning {
-            viewModel.tick(now: Date())
-            try? await Task.sleep(nanoseconds: 200_000_000)
-        }
     }
 
     private var contentMaxWidth: CGFloat? {

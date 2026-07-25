@@ -18,6 +18,7 @@ final class WorkoutViewModel {
     private var engine: TabataEngine
     private let defaults: UserDefaults
     private let presetStore: TabataPresetStore
+    private let stateStore: TabataStateStore
     private let connectivity = PhoneConnectivity()
     private let cuePerformer = PhoneCuePerformer()
     private let liveActivityController = TabataLiveActivityController()
@@ -25,11 +26,15 @@ final class WorkoutViewModel {
     private var lastCountdownCue: CountdownCue?
     @ObservationIgnored
     private var didActivate = false
+    @ObservationIgnored
+    private var tickTask: Task<Void, Never>?
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         let presetStore = TabataPresetStore(defaults: defaults)
         self.presetStore = presetStore
+        let stateStore = TabataStateStore(defaults: defaults)
+        self.stateStore = stateStore
         let presetCatalog = presetStore.loadCatalog()
         self.presetCatalog = presetCatalog
 
@@ -44,8 +49,16 @@ final class WorkoutViewModel {
             initialState.startCountdownEnabled = defaults.bool(forKey: Self.startCountdownEnabledKey)
         }
 
+        let now = Date()
+        if var restored = stateStore.restore(now: now) {
+            restored.soundsEnabled = initialState.soundsEnabled
+            restored.hapticsEnabled = initialState.hapticsEnabled
+            restored.startCountdownEnabled = initialState.startCountdownEnabled
+            initialState = restored
+        }
+
         state = initialState
-        now = Date()
+        self.now = now
         engine = TabataEngine(state: initialState)
     }
 
@@ -75,15 +88,14 @@ final class WorkoutViewModel {
             self?.handle(command)
         }
         connectivity.activate()
-        sendState()
-        syncLiveActivity()
+        publishState()
+        syncRunningState()
     }
 
     func tick(now: Date = Date()) {
         let oldState = state
         self.now = now
         state = engine.tick(now: now)
-        updateIdleTimer()
 
         if state.soundsEnabled, TabataCuePolicy.needsTransitionCue(from: oldState, to: state) {
             cuePerformer.playTransition()
@@ -95,9 +107,10 @@ final class WorkoutViewModel {
             lastCountdownCue = cue
         }
 
+        syncRunningState()
+
         if oldState != state {
-            sendState()
-            syncLiveActivity()
+            publishState()
         }
     }
 
@@ -106,9 +119,8 @@ final class WorkoutViewModel {
         self.now = now
         engine.toggleRunning(now: now)
         state = engine.state
-        updateIdleTimer()
-        sendState()
-        syncLiveActivity()
+        syncRunningState()
+        publishState()
     }
 
     func reset() {
@@ -123,9 +135,8 @@ final class WorkoutViewModel {
         engine = TabataEngine(state: resetState)
         state = engine.state
         lastCountdownCue = nil
-        updateIdleTimer()
-        sendState()
-        syncLiveActivity()
+        syncRunningState()
+        publishState()
     }
 
     func setSoundsEnabled(_ enabled: Bool) {
@@ -134,7 +145,7 @@ final class WorkoutViewModel {
         engine.setSoundsEnabled(enabled)
         state = engine.state
         lastCountdownCue = nil
-        sendState()
+        publishState()
     }
 
     func selectPreset(_ preset: TabataPreset) {
@@ -191,7 +202,7 @@ final class WorkoutViewModel {
         engine.setHapticsEnabled(enabled)
         state = engine.state
         lastCountdownCue = nil
-        sendState()
+        publishState()
     }
 
     func setStartCountdownEnabled(_ enabled: Bool) {
@@ -200,7 +211,7 @@ final class WorkoutViewModel {
         engine.setStartCountdownEnabled(enabled)
         state = engine.state
         lastCountdownCue = nil
-        sendState()
+        publishState()
     }
 
     private func handle(_ payload: WatchCommandPayload) {
@@ -218,11 +229,9 @@ final class WorkoutViewModel {
         }
     }
 
-    private func sendState() {
+    private func publishState() {
         connectivity.send(state)
-    }
-
-    private func syncLiveActivity() {
+        stateStore.save(state, at: now)
         liveActivityController.sync(state: state, now: now)
     }
 
@@ -239,13 +248,43 @@ final class WorkoutViewModel {
         engine = TabataEngine(state: selectedState)
         state = selectedState
         lastCountdownCue = nil
-        updateIdleTimer()
-        sendState()
-        syncLiveActivity()
+        syncRunningState()
+        publishState()
     }
 
-    private func updateIdleTimer() {
+    // The timer belongs to the view model rather than the view so a workout keeps running, cueing,
+    // and updating its Live Activity while the app is in the background.
+    private func syncRunningState() {
+        if state.isRunning {
+            startTicking()
+        } else {
+            stopTicking()
+        }
+
+        cuePerformer.setWorkoutAudioActive(state.isRunning)
         UIApplication.shared.isIdleTimerDisabled = state.isRunning
+    }
+
+    private func startTicking() {
+        guard tickTask == nil else {
+            return
+        }
+
+        tickTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                guard let self, self.state.isRunning else {
+                    return
+                }
+
+                self.tick(now: Date())
+                try? await Task.sleep(nanoseconds: 200_000_000)
+            }
+        }
+    }
+
+    private func stopTicking() {
+        tickTask?.cancel()
+        tickTask = nil
     }
 
     private func startFromWatch() {
@@ -257,9 +296,8 @@ final class WorkoutViewModel {
         engine.start(now: now)
         state = engine.state
         lastCountdownCue = nil
-        updateIdleTimer()
-        sendState()
-        syncLiveActivity()
+        syncRunningState()
+        publishState()
     }
 
     private func pauseFromWatch() {
@@ -271,9 +309,8 @@ final class WorkoutViewModel {
         engine.pause(now: now)
         state = engine.state
         lastCountdownCue = nil
-        updateIdleTimer()
-        sendState()
-        syncLiveActivity()
+        syncRunningState()
+        publishState()
     }
 
     private func resumeFromWatch() {
@@ -285,28 +322,50 @@ final class WorkoutViewModel {
         engine.resume(now: now)
         state = engine.state
         lastCountdownCue = nil
-        updateIdleTimer()
-        sendState()
-        syncLiveActivity()
+        syncRunningState()
+        publishState()
     }
 }
 
+@MainActor
 private final class PhoneCuePerformer {
     private static let duckReleaseDelay: TimeInterval = 1.5
 
     private let countdownPlayer: AVAudioPlayer?
     private let transitionPlayer: AVAudioPlayer?
-    private var duckRelease: DispatchWorkItem?
+    private let keepAlivePlayer: AVAudioPlayer?
+    private var duckRelease: Task<Void, Never>?
+    private var isWorkoutAudioActive = false
 
     init() {
         // The category has to be in place before anything touches the audio hardware: the default
         // .soloAmbient category stops whatever the user is already listening to.
-        let session = AVAudioSession.sharedInstance()
-        try? session.setCategory(.playback, mode: .default, options: [.mixWithOthers, .duckOthers])
-        try? session.setActive(false, options: .notifyOthersOnDeactivation)
+        Self.setSessionOptions(ducksOthers: false)
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
 
         countdownPlayer = Self.makePlayer(frequency: 880, duration: 0.08)
         transitionPlayer = Self.makePlayer(frequency: 1320, duration: 0.16)
+        keepAlivePlayer = Self.makePlayer(frequency: 0, duration: 1, amplitude: 0)
+        keepAlivePlayer?.numberOfLoops = -1
+    }
+
+    // A running workout plays silence so iOS keeps the app alive with the screen off. This is called
+    // on every tick as well as on state changes, so playback picks itself back up after an
+    // interruption such as a phone call.
+    func setWorkoutAudioActive(_ isActive: Bool) {
+        isWorkoutAudioActive = isActive
+
+        guard isActive else {
+            releaseSessionIfIdle()
+            return
+        }
+
+        guard let keepAlivePlayer, !keepAlivePlayer.isPlaying else {
+            return
+        }
+
+        try? AVAudioSession.sharedInstance().setActive(true)
+        keepAlivePlayer.play()
     }
 
     func playCountdown() {
@@ -323,32 +382,55 @@ private final class PhoneCuePerformer {
         }
 
         duckRelease?.cancel()
+        Self.setSessionOptions(ducksOthers: true)
         try? AVAudioSession.sharedInstance().setActive(true)
         player.currentTime = 0
         player.play()
         scheduleDuckRelease(after: player.duration + Self.duckReleaseDelay)
     }
 
-    // Other audio stays ducked for as long as the session is active, so the session is released
-    // once the cues stop. A cue landing inside the delay keeps the current duck instead of retriggering it.
+    // Other audio stays ducked for as long as the option is set, so it is dropped once the cues stop.
+    // A cue landing inside the delay keeps the current duck instead of retriggering it.
     private func scheduleDuckRelease(after delay: TimeInterval) {
-        let release = DispatchWorkItem {
-            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-        }
+        duckRelease = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
 
-        duckRelease = release
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: release)
+            guard !Task.isCancelled, let self else {
+                return
+            }
+
+            self.duckRelease = nil
+            Self.setSessionOptions(ducksOthers: false)
+            self.releaseSessionIfIdle()
+        }
     }
 
-    private static func makePlayer(frequency: Double, duration: Double) -> AVAudioPlayer? {
-        guard let data = toneData(frequency: frequency, duration: duration) else {
+    // The session is held until the last cue has finished, so ending a workout never clips its final beep.
+    private func releaseSessionIfIdle() {
+        guard !isWorkoutAudioActive, duckRelease == nil else {
+            return
+        }
+
+        keepAlivePlayer?.stop()
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    }
+
+    private static func setSessionOptions(ducksOthers: Bool) {
+        let options: AVAudioSession.CategoryOptions = ducksOthers
+            ? [.mixWithOthers, .duckOthers]
+            : [.mixWithOthers]
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: options)
+    }
+
+    private static func makePlayer(frequency: Double, duration: Double, amplitude: Double = 0.25) -> AVAudioPlayer? {
+        guard let data = toneData(frequency: frequency, duration: duration, amplitude: amplitude) else {
             return nil
         }
 
         return try? AVAudioPlayer(data: data)
     }
 
-    private static func toneData(frequency: Double, duration: Double) -> Data? {
+    private static func toneData(frequency: Double, duration: Double, amplitude: Double) -> Data? {
         let sampleRate = 22_050
         let sampleCount = Int(duration * Double(sampleRate))
         let byteCount = sampleCount * MemoryLayout<Int16>.size
@@ -371,7 +453,7 @@ private final class PhoneCuePerformer {
         for sampleIndex in 0..<sampleCount {
             let position = Double(sampleIndex) / Double(sampleRate)
             let envelope = min(1, Double(sampleCount - sampleIndex) / Double(sampleCount) * 4)
-            let value = sin(2 * Double.pi * frequency * position) * Double(Int16.max) * 0.25 * envelope
+            let value = sin(2 * Double.pi * frequency * position) * Double(Int16.max) * amplitude * envelope
             append(Int16(value).littleEndian, to: &data)
         }
 

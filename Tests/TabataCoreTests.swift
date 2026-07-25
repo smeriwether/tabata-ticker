@@ -264,6 +264,52 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertFalse(catalog.canCreatePreset)
     }
 
+    func testInterruptedWorkoutRestoresAtItsCurrentPhase() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+
+        startWorkout(&engine, now: start)
+        let saved = engine.state
+        let restored = TabataStateStore.restorable(saved, savedAt: start, now: start.addingTimeInterval(35))
+
+        XCTAssertEqual(restored?.phase, .work)
+        XCTAssertEqual(restored?.round, 2)
+        XCTAssertEqual(restored?.remaining(at: start.addingTimeInterval(35)), 15)
+    }
+
+    func testPausedWorkoutRestoresWithRemainingTimeIntact() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+
+        startWorkout(&engine, now: start)
+        engine.pause(now: start.addingTimeInterval(8))
+        let restored = TabataStateStore.restorable(engine.state, savedAt: start.addingTimeInterval(8), now: start.addingTimeInterval(600))
+
+        XCTAssertEqual(restored?.phase, .work)
+        XCTAssertFalse(restored?.isRunning ?? true)
+        XCTAssertEqual(restored?.remaining(at: start.addingTimeInterval(600)), 12)
+    }
+
+    func testWorkoutThatFinishedWhileAwayDoesNotRestore() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+
+        startWorkout(&engine, now: start)
+
+        XCTAssertNil(TabataStateStore.restorable(engine.state, savedAt: start, now: start.addingTimeInterval(400)))
+    }
+
+    func testStaleAndIdleStatesDoNotRestore() {
+        let start = Date(timeIntervalSince1970: 100)
+        var engine = TabataEngine()
+
+        startWorkout(&engine, now: start)
+        let stale = start.addingTimeInterval(TabataStateStore.maxRestoreAge + 1)
+
+        XCTAssertNil(TabataStateStore.restorable(engine.state, savedAt: start, now: stale))
+        XCTAssertNil(TabataStateStore.restorable(.idle(), savedAt: start, now: start.addingTimeInterval(5)))
+    }
+
     func testStatePayloadRoundTrips() {
         let start = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()

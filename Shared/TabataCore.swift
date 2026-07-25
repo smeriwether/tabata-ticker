@@ -171,6 +171,70 @@ struct TabataPresetStore {
     }
 }
 
+struct TabataStateStore {
+    static let maxRestoreAge: TimeInterval = 6 * 60 * 60
+
+    private static let stateKey = "tabataState.active"
+    private static let savedAtKey = "tabataState.activeSavedAt"
+
+    private let defaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    func save(_ state: TabataState, at date: Date) {
+        guard Self.isUnfinished(state) else {
+            clear()
+            return
+        }
+
+        guard let data = try? JSONEncoder().encode(state) else {
+            return
+        }
+
+        defaults.set(data, forKey: Self.stateKey)
+        defaults.set(date.timeIntervalSince1970, forKey: Self.savedAtKey)
+    }
+
+    func clear() {
+        defaults.removeObject(forKey: Self.stateKey)
+        defaults.removeObject(forKey: Self.savedAtKey)
+    }
+
+    func restore(now: Date) -> TabataState? {
+        guard
+            let data = defaults.data(forKey: Self.stateKey),
+            let state = try? JSONDecoder().decode(TabataState.self, from: data)
+        else {
+            return nil
+        }
+
+        return Self.restorable(state, savedAt: Date(timeIntervalSince1970: defaults.double(forKey: Self.savedAtKey)), now: now)
+    }
+
+    // A workout only comes back if it was interrupted recently and is still under way, so reopening
+    // the app hours later starts fresh instead of resuming something the user has long since left.
+    static func restorable(_ state: TabataState, savedAt: Date, now: Date) -> TabataState? {
+        guard isUnfinished(state) else {
+            return nil
+        }
+
+        let age = now.timeIntervalSince(savedAt)
+        guard age >= 0, age < maxRestoreAge else {
+            return nil
+        }
+
+        var engine = TabataEngine(state: state)
+        let advanced = engine.tick(now: now)
+        return isUnfinished(advanced) ? advanced : nil
+    }
+
+    private static func isUnfinished(_ state: TabataState) -> Bool {
+        state.phase == .countdown || state.isWorkoutPhase
+    }
+}
+
 struct TabataState: Codable, Equatable, Sendable {
     static let startCountdownDuration: TimeInterval = 5
 
