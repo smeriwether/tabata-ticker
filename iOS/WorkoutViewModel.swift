@@ -292,9 +292,22 @@ final class WorkoutViewModel {
 }
 
 private final class PhoneCuePerformer {
-    private let countdownPlayer = PhoneCuePerformer.makePlayer(frequency: 880, duration: 0.08)
-    private let transitionPlayer = PhoneCuePerformer.makePlayer(frequency: 1320, duration: 0.16)
-    private var didConfigureSession = false
+    private static let duckReleaseDelay: TimeInterval = 1.5
+
+    private let countdownPlayer: AVAudioPlayer?
+    private let transitionPlayer: AVAudioPlayer?
+    private var duckRelease: DispatchWorkItem?
+
+    init() {
+        // The category has to be in place before anything touches the audio hardware: the default
+        // .soloAmbient category stops whatever the user is already listening to.
+        let session = AVAudioSession.sharedInstance()
+        try? session.setCategory(.playback, mode: .default, options: [.mixWithOthers, .duckOthers])
+        try? session.setActive(false, options: .notifyOthersOnDeactivation)
+
+        countdownPlayer = Self.makePlayer(frequency: 880, duration: 0.08)
+        transitionPlayer = Self.makePlayer(frequency: 1320, duration: 0.16)
+    }
 
     func playCountdown() {
         play(countdownPlayer)
@@ -305,24 +318,26 @@ private final class PhoneCuePerformer {
     }
 
     private func play(_ player: AVAudioPlayer?) {
-        configureSession()
-        player?.currentTime = 0
-        player?.play()
+        guard let player else {
+            return
+        }
+
+        duckRelease?.cancel()
+        try? AVAudioSession.sharedInstance().setActive(true)
+        player.currentTime = 0
+        player.play()
+        scheduleDuckRelease(after: player.duration + Self.duckReleaseDelay)
     }
 
-    private func configureSession() {
-        guard !didConfigureSession else {
-            return
+    // Other audio stays ducked for as long as the session is active, so the session is released
+    // once the cues stop. A cue landing inside the delay keeps the current duck instead of retriggering it.
+    private func scheduleDuckRelease(after delay: TimeInterval) {
+        let release = DispatchWorkItem {
+            try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         }
 
-        let session = AVAudioSession.sharedInstance()
-        do {
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-            try session.setActive(true)
-            didConfigureSession = true
-        } catch {
-            return
-        }
+        duckRelease = release
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: release)
     }
 
     private static func makePlayer(frequency: Double, duration: Double) -> AVAudioPlayer? {
@@ -330,9 +345,7 @@ private final class PhoneCuePerformer {
             return nil
         }
 
-        let player = try? AVAudioPlayer(data: data)
-        player?.prepareToPlay()
-        return player
+        return try? AVAudioPlayer(data: data)
     }
 
     private static func toneData(frequency: Double, duration: Double) -> Data? {

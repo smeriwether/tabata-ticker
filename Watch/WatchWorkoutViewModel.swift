@@ -226,8 +226,17 @@ private final class WatchRuntimeSessionController: NSObject, WKExtendedRuntimeSe
 }
 
 private final class WatchCuePerformer {
-    private let countdownPlayer = WatchCuePerformer.makePlayer(frequency: 880, duration: 0.08)
-    private let transitionPlayer = WatchCuePerformer.makePlayer(frequency: 1320, duration: 0.16)
+    private let countdownPlayer: AVAudioPlayer?
+    private let transitionPlayer: AVAudioPlayer?
+
+    init() {
+        // The category has to be in place before anything touches the audio hardware: the default
+        // .soloAmbient category stops whatever the user is already listening to.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+
+        countdownPlayer = Self.makePlayer(frequency: 880, duration: 0.08)
+        transitionPlayer = Self.makePlayer(frequency: 1320, duration: 0.16)
+    }
 
     func playCountdown(soundsEnabled: Bool, hapticsEnabled: Bool) {
         if soundsEnabled {
