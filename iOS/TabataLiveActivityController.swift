@@ -66,41 +66,31 @@ final class TabataLiveActivityController {
 private extension TabataLiveActivityAttributes.ContentState {
     init(state: TabataState, now: Date) {
         let presentation = TabataPresentation(state: state)
-        let phaseRemaining = Int(ceil(state.remaining(at: now)))
         let tint = presentation.background.start
+        let phaseDuration = max(1, state.phaseDuration)
 
         title = presentation.title
         roundText = "\(state.round)/\(state.config.rounds)"
-        symbol = Self.symbol(for: state)
         isRunning = state.isRunning
-        phase = state.phase.rawValue
-        round = state.round
-        totalRounds = state.config.rounds
-        workDurationSeconds = max(1, Int(ceil(state.config.workDuration)))
-        restDurationSeconds = max(1, Int(ceil(state.config.restDuration)))
-        startsAt = state.phaseStartedAt ?? now
-        endsAt = now.addingTimeInterval(TimeInterval(phaseRemaining))
+        phaseIconName = state.isRunning && state.phase == .work ? "bolt.fill" : "pause.fill"
+
+        // The exact phase boundaries, not a rounded remaining count, because the system renders the
+        // countdown from these dates. A paused phase is frozen by pointing pausedAt at this moment.
+        if state.isRunning, let phaseStartedAt = state.phaseStartedAt {
+            startsAt = phaseStartedAt
+            endsAt = phaseStartedAt.addingTimeInterval(phaseDuration)
+            pausedAt = nil
+        } else {
+            let phaseEnd = now.addingTimeInterval(state.remaining(at: now))
+            startsAt = phaseEnd.addingTimeInterval(-phaseDuration)
+            endsAt = phaseEnd
+            pausedAt = now
+        }
+
         workoutEndsAt = now.addingTimeInterval(Self.workoutRemainingDuration(for: state, now: now))
-        remainingSeconds = phaseRemaining
-        phaseDurationSeconds = max(1, Int(ceil(state.phaseDuration)))
         tintRed = tint.red
         tintGreen = tint.green
         tintBlue = tint.blue
-    }
-
-    private static func symbol(for state: TabataState) -> String {
-        if !state.isRunning {
-            return "II"
-        }
-
-        switch state.phase {
-        case .work:
-            return "W"
-        case .rest:
-            return "R"
-        case .idle, .countdown, .complete:
-            return "T"
-        }
     }
 
     private static func workoutRemainingDuration(for state: TabataState, now: Date) -> TimeInterval {
