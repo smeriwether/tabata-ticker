@@ -20,9 +20,22 @@ final class PhoneConnectivity: NSObject, WCSessionDelegate {
             return
         }
 
-        let payload = state.payloadDictionary()
         let session = WCSession.default
-        try? session.updateApplicationContext(payload)
+
+        // Without a paired watch app there is nothing to mirror to, and every send would fail.
+        guard session.activationState == .activated, session.isPaired, session.isWatchAppInstalled else {
+            return
+        }
+
+        let payload = state.payloadDictionary()
+
+        do {
+            try session.updateApplicationContext(payload)
+        } catch {
+            // Message delivery failures are routine when the watch app is asleep, but a rejected
+            // application context means the watch has stopped mirroring the workout entirely.
+            TabataDiagnostics.report("Sending workout state to the watch failed", error: error)
+        }
 
         if session.isReachable {
             session.sendMessage(payload, replyHandler: nil, errorHandler: nil)

@@ -43,6 +43,7 @@ final class TabataLiveActivityController {
             )
         } catch {
             activity = nil
+            TabataDiagnostics.report("Starting the Live Activity failed", error: error)
         }
     }
 

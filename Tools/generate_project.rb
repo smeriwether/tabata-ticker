@@ -85,6 +85,12 @@ package_ref.relative_path = "."
 project.root_object.package_references << package_ref
 add_package_product(project, test_target, package_ref, "TabataCore")
 
+sentry_ref = project.new(Xcodeproj::Project::Object::XCRemoteSwiftPackageReference)
+sentry_ref.repositoryURL = "https://github.com/getsentry/sentry-cocoa.git"
+sentry_ref.requirement = { "kind" => "upToNextMajorVersion", "minimumVersion" => "9.23.0" }
+project.root_object.package_references << sentry_ref
+add_package_product(project, ios_target, sentry_ref, "Sentry")
+
 asset_ref = project.new_file("Assets.xcassets")
 legacy_icon_refs = Dir["Resources/*.png"].sort.map { |path| project.new_file(path) }
 ios_target.add_resources([asset_ref] + legacy_icon_refs)

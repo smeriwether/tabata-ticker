@@ -137,6 +137,21 @@ struct TabataPresetCatalog: Equatable, Sendable {
     }
 }
 
+// Shared code is built for the watch and for tests as well as the iPhone app, so it reports failures
+// through this seam instead of depending on a crash reporter directly. The iPhone app points it at
+// Sentry during launch, before anything else can report, which is why the unchecked access is safe.
+enum TabataDiagnostics {
+    nonisolated(unsafe) private static var reporter: (@Sendable (String, (any Error)?) -> Void)?
+
+    static func setReporter(_ reporter: @escaping @Sendable (String, (any Error)?) -> Void) {
+        Self.reporter = reporter
+    }
+
+    static func report(_ context: String, error: (any Error)? = nil) {
+        reporter?(context, error)
+    }
+}
+
 struct TabataPresetStore {
     private static let customPresetsKey = "tabataPreset.customPresets"
     private static let selectedPresetIDKey = "tabataPreset.selectedPresetID"
@@ -155,10 +170,12 @@ struct TabataPresetStore {
     }
 
     func save(_ catalog: TabataPresetCatalog) {
-        let encoder = JSONEncoder()
-        if let data = try? encoder.encode(catalog.userPresets) {
-            defaults.set(data, forKey: Self.customPresetsKey)
+        do {
+            defaults.set(try JSONEncoder().encode(catalog.userPresets), forKey: Self.customPresetsKey)
+        } catch {
+            TabataDiagnostics.report("Saving custom presets failed", error: error)
         }
+
         defaults.set(catalog.selectedID, forKey: Self.selectedPresetIDKey)
     }
 
@@ -167,7 +184,12 @@ struct TabataPresetStore {
             return []
         }
 
-        return (try? JSONDecoder().decode([TabataPreset].self, from: data)) ?? []
+        do {
+            return try JSONDecoder().decode([TabataPreset].self, from: data)
+        } catch {
+            TabataDiagnostics.report("Stored custom presets could not be read", error: error)
+            return []
+        }
     }
 }
 
@@ -189,12 +211,12 @@ struct TabataStateStore {
             return
         }
 
-        guard let data = try? JSONEncoder().encode(state) else {
-            return
+        do {
+            defaults.set(try JSONEncoder().encode(state), forKey: Self.stateKey)
+            defaults.set(date.timeIntervalSince1970, forKey: Self.savedAtKey)
+        } catch {
+            TabataDiagnostics.report("Saving the active workout failed", error: error)
         }
-
-        defaults.set(data, forKey: Self.stateKey)
-        defaults.set(date.timeIntervalSince1970, forKey: Self.savedAtKey)
     }
 
     func clear() {
@@ -203,14 +225,18 @@ struct TabataStateStore {
     }
 
     func restore(now: Date) -> TabataState? {
-        guard
-            let data = defaults.data(forKey: Self.stateKey),
-            let state = try? JSONDecoder().decode(TabataState.self, from: data)
-        else {
+        guard let data = defaults.data(forKey: Self.stateKey) else {
             return nil
         }
 
-        return Self.restorable(state, savedAt: Date(timeIntervalSince1970: defaults.double(forKey: Self.savedAtKey)), now: now)
+        do {
+            let state = try JSONDecoder().decode(TabataState.self, from: data)
+            return Self.restorable(state, savedAt: Date(timeIntervalSince1970: defaults.double(forKey: Self.savedAtKey)), now: now)
+        } catch {
+            TabataDiagnostics.report("Stored workout could not be read", error: error)
+            clear()
+            return nil
+        }
     }
 
     // A workout only comes back if it was interrupted recently and is still under way, so reopening

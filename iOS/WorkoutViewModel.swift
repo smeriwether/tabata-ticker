@@ -336,17 +336,31 @@ private final class PhoneCuePerformer {
     private let keepAlivePlayer: AVAudioPlayer?
     private var duckRelease: Task<Void, Never>?
     private var isWorkoutAudioActive = false
+    private var didReportSessionFailure = false
 
     init() {
         // The category has to be in place before anything touches the audio hardware: the default
         // .soloAmbient category stops whatever the user is already listening to.
-        Self.setSessionOptions(ducksOthers: false)
+        do {
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback,
+                mode: .default,
+                options: Self.categoryOptions(ducksOthers: false)
+            )
+        } catch {
+            TabataDiagnostics.report("Configuring the audio session failed", error: error)
+        }
+
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
 
         countdownPlayer = Self.makePlayer(frequency: 880, duration: 0.08)
         transitionPlayer = Self.makePlayer(frequency: 1320, duration: 0.16)
         keepAlivePlayer = Self.makePlayer(frequency: 0, duration: 1, amplitude: 0)
         keepAlivePlayer?.numberOfLoops = -1
+
+        if countdownPlayer == nil || transitionPlayer == nil || keepAlivePlayer == nil {
+            TabataDiagnostics.report("Workout cue audio could not be prepared")
+        }
     }
 
     // A running workout plays silence so iOS keeps the app alive with the screen off. This is called
@@ -364,7 +378,7 @@ private final class PhoneCuePerformer {
             return
         }
 
-        try? AVAudioSession.sharedInstance().setActive(true)
+        activateSession()
         keepAlivePlayer.play()
     }
 
@@ -382,8 +396,8 @@ private final class PhoneCuePerformer {
         }
 
         duckRelease?.cancel()
-        Self.setSessionOptions(ducksOthers: true)
-        try? AVAudioSession.sharedInstance().setActive(true)
+        applyCategoryOptions(ducksOthers: true)
+        activateSession()
         player.currentTime = 0
         player.play()
         scheduleDuckRelease(after: player.duration + Self.duckReleaseDelay)
@@ -400,7 +414,7 @@ private final class PhoneCuePerformer {
             }
 
             self.duckRelease = nil
-            Self.setSessionOptions(ducksOthers: false)
+            self.applyCategoryOptions(ducksOthers: false)
             self.releaseSessionIfIdle()
         }
     }
@@ -415,11 +429,38 @@ private final class PhoneCuePerformer {
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
-    private static func setSessionOptions(ducksOthers: Bool) {
-        let options: AVAudioSession.CategoryOptions = ducksOthers
-            ? [.mixWithOthers, .duckOthers]
-            : [.mixWithOthers]
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: options)
+    private func applyCategoryOptions(ducksOthers: Bool) {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback,
+                mode: .default,
+                options: Self.categoryOptions(ducksOthers: ducksOthers)
+            )
+        } catch {
+            reportSessionFailureOnce("Adjusting the audio session failed", error: error)
+        }
+    }
+
+    private func activateSession() {
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            reportSessionFailureOnce("Activating the audio session failed", error: error)
+        }
+    }
+
+    // Both callers run on every tick of a workout, so only the first failure of a launch is reported.
+    private func reportSessionFailureOnce(_ context: String, error: any Error) {
+        guard !didReportSessionFailure else {
+            return
+        }
+
+        didReportSessionFailure = true
+        TabataDiagnostics.report(context, error: error)
+    }
+
+    private static func categoryOptions(ducksOthers: Bool) -> AVAudioSession.CategoryOptions {
+        ducksOthers ? [.mixWithOthers, .duckOthers] : [.mixWithOthers]
     }
 
     private static func makePlayer(frequency: Double, duration: Double, amplitude: Double = 0.25) -> AVAudioPlayer? {
