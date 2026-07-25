@@ -8,6 +8,7 @@ import WatchKit
 final class WatchWorkoutViewModel {
     private(set) var state: TabataState
     private(set) var now: Date
+    private(set) var catalog = TabataPresetCatalog()
 
     private static let soundsEnabledKey = "soundsEnabled"
     private static let hapticsEnabledKey = "hapticsEnabled"
@@ -54,7 +55,32 @@ final class WatchWorkoutViewModel {
         connectivity.onState = { [weak self] state in
             self?.receive(state)
         }
+        connectivity.onCatalog = { [weak self] catalog in
+            self?.catalog = catalog
+        }
         connectivity.activate()
+    }
+
+    var presets: [TabataPreset] {
+        catalog.presets
+    }
+
+    var selectedPreset: TabataPreset {
+        catalog.selectedPreset
+    }
+
+    var canSelectPreset: Bool {
+        state.phase == .idle && catalog.presets.count > 1
+    }
+
+    // The phone owns the catalog, so the selection is echoed back with the new state; showing it
+    // immediately keeps the watch from looking unresponsive while that round trip happens.
+    func selectPreset(_ preset: TabataPreset) {
+        guard state.phase == .idle, catalog.selectPreset(id: preset.id) else {
+            return
+        }
+
+        connectivity.send(WatchCommandPayload(command: .selectPreset, soundsEnabled: nil, presetID: preset.id))
     }
 
     func tick(now: Date = Date()) {

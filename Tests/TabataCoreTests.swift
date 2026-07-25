@@ -331,6 +331,34 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertEqual(decoded?.startCountdownEnabled, true)
     }
 
+    func testStatePayloadCarriesPresetCatalogToTheWatch() {
+        var catalog = TabataPresetCatalog()
+        catalog.addUserPreset(config: TabataConfig.preset(workSeconds: 45, restSeconds: 15, rounds: 6), id: "custom")
+        let payload = TabataState.idle().payloadDictionary(catalog: catalog)
+
+        let decoded = TabataState.catalogFromPayloadDictionary(payload)
+
+        XCTAssertEqual(decoded?.presets.map(\.name), ["20/10/8", "45/15/6"])
+        XCTAssertEqual(decoded?.selectedID, "custom")
+        XCTAssertEqual(TabataState.fromPayloadDictionary(payload), TabataState.idle())
+    }
+
+    func testStateStillDecodesWhenThePhoneSendsNoCatalog() {
+        let payload = TabataState.idle().payloadDictionary()
+
+        XCTAssertNotNil(TabataState.fromPayloadDictionary(payload))
+        XCTAssertNil(TabataState.catalogFromPayloadDictionary(payload))
+    }
+
+    func testSelectPresetCommandRoundTrips() {
+        let payload = WatchCommandPayload(command: .selectPreset, presetID: "custom")
+        let decoded = WatchCommandPayload.fromPayloadDictionary(payload.payloadDictionary())
+
+        XCTAssertEqual(decoded?.command, .selectPreset)
+        XCTAssertEqual(decoded?.presetID, "custom")
+        XCTAssertNil(decoded?.soundsEnabled)
+    }
+
     func testWatchCommandPayloadRoundTripsForFallbackDelivery() {
         let payload = WatchCommandPayload(command: .pause, soundsEnabled: nil)
         let decoded = WatchCommandPayload.fromPayloadDictionary(payload.payloadDictionary())

@@ -15,7 +15,7 @@ final class PhoneConnectivity: NSObject, WCSessionDelegate {
         session.activate()
     }
 
-    func send(_ state: TabataState) {
+    func send(_ state: TabataState, catalog: TabataPresetCatalog) {
         guard WCSession.isSupported() else {
             return
         }
@@ -27,7 +27,7 @@ final class PhoneConnectivity: NSObject, WCSessionDelegate {
             return
         }
 
-        let payload = state.payloadDictionary()
+        let payload = state.payloadDictionary(catalog: catalog)
 
         do {
             try session.updateApplicationContext(payload)

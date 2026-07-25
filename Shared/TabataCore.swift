@@ -665,20 +665,58 @@ enum WatchCommand: String, Codable, Sendable {
     case resume
     case reset
     case setSoundsEnabled
+    case selectPreset
 }
 
 struct WatchCommandPayload: Codable, Sendable {
     var command: WatchCommand
     var soundsEnabled: Bool?
+    var presetID: String?
+
+    init(command: WatchCommand, soundsEnabled: Bool? = nil, presetID: String? = nil) {
+        self.command = command
+        self.soundsEnabled = soundsEnabled
+        self.presetID = presetID
+    }
 }
 
 extension TabataState {
+    private enum SyncKey {
+        static let presets = "syncPresets"
+        static let selectedPresetID = "syncSelectedPresetID"
+    }
+
     func payloadDictionary() -> [String: Any] {
         CodablePayload.dictionary(from: self)
     }
 
+    // The catalog rides in the same dictionary as the state rather than replacing it, so a watch
+    // build that only knows about the state keys keeps mirroring a newer phone.
+    func payloadDictionary(catalog: TabataPresetCatalog) -> [String: Any] {
+        var dictionary = payloadDictionary()
+        dictionary[SyncKey.presets] = CodablePayload.array(from: catalog.presets)
+        dictionary[SyncKey.selectedPresetID] = catalog.selectedID
+        return dictionary
+    }
+
     static func fromPayloadDictionary(_ dictionary: [String: Any]) -> TabataState? {
         CodablePayload.value(TabataState.self, from: dictionary)
+    }
+
+    static func catalogFromPayloadDictionary(_ dictionary: [String: Any]) -> TabataPresetCatalog? {
+        guard
+            let rawPresets = dictionary[SyncKey.presets] as? [Any],
+            let selectedID = dictionary[SyncKey.selectedPresetID] as? String
+        else {
+            return nil
+        }
+
+        let presets = CodablePayload.values(TabataPreset.self, from: rawPresets)
+        guard !presets.isEmpty else {
+            return nil
+        }
+
+        return TabataPresetCatalog(customPresets: presets.filter { !$0.isDefault }, selectedID: selectedID)
     }
 }
 
@@ -706,6 +744,20 @@ private enum CodablePayload {
         }
 
         return dictionary
+    }
+
+    static func array<T: Encodable>(from values: [T]) -> [[String: Any]] {
+        values.map { dictionary(from: $0) }.filter { !$0.isEmpty }
+    }
+
+    static func values<T: Decodable>(_ type: T.Type, from array: [Any]) -> [T] {
+        array.compactMap { element in
+            guard let dictionary = element as? [String: Any] else {
+                return nil
+            }
+
+            return value(type, from: dictionary)
+        }
     }
 
     static func value<T: Decodable>(_ type: T.Type, from dictionary: [String: Any]) -> T? {

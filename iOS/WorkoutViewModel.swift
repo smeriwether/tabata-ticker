@@ -163,6 +163,14 @@ final class WorkoutViewModel {
         publishState()
     }
 
+    func selectPreset(id: String) {
+        guard let preset = presetCatalog.presets.first(where: { $0.id == id }) else {
+            return
+        }
+
+        selectPreset(preset)
+    }
+
     func selectPreset(_ preset: TabataPreset) {
         guard state.phase == .idle, presetCatalog.selectPreset(id: preset.id) else {
             return
@@ -241,11 +249,17 @@ final class WorkoutViewModel {
             reset()
         case .setSoundsEnabled:
             setSoundsEnabled(payload.soundsEnabled ?? state.soundsEnabled)
+        case .selectPreset:
+            guard let presetID = payload.presetID else {
+                return
+            }
+
+            selectPreset(id: presetID)
         }
     }
 
     private func publishState() {
-        connectivity.send(state)
+        connectivity.send(state, catalog: presetCatalog)
         stateStore.save(state, at: now)
         liveActivityController.sync(state: state, now: now)
     }

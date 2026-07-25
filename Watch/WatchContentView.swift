@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WatchContentView: View {
     @State private var viewModel = WatchWorkoutViewModel()
+    @State private var isChoosingPreset = false
 
     var body: some View {
         ZStack {
@@ -20,9 +21,30 @@ struct WatchContentView: View {
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
 
-                Text(presentation.watchRoundText)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.85))
+                // Takes the place of the round count rather than adding a row, which does not fit on
+                // the smallest watches. The preset name says the same thing and more.
+                if viewModel.canSelectPreset {
+                    Button {
+                        isChoosingPreset = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "timer")
+
+                            Text(viewModel.selectedPreset.name)
+                                .monospacedDigit()
+                        }
+                        .font(.caption.weight(.bold))
+                    }
+                    .buttonStyle(.glass)
+                    .controlSize(.mini)
+                    .foregroundStyle(.white)
+                    .accessibilityLabel("Preset")
+                    .accessibilityValue(viewModel.selectedPreset.name)
+                } else {
+                    Text(presentation.watchRoundText)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.85))
+                }
 
                 Spacer(minLength: 10)
 
@@ -51,6 +73,35 @@ struct WatchContentView: View {
         .onAppear {
             viewModel.activate()
         }
+        .sheet(isPresented: $isChoosingPreset) {
+            presetPicker
+        }
+    }
+
+    private var presetPicker: some View {
+        List {
+            ForEach(viewModel.presets) { preset in
+                Button {
+                    viewModel.selectPreset(preset)
+                    isChoosingPreset = false
+                } label: {
+                    HStack {
+                        Text(preset.name)
+                            .font(.body.weight(.semibold))
+                            .monospacedDigit()
+
+                        Spacer(minLength: 8)
+
+                        if preset.id == viewModel.selectedPreset.id {
+                            Image(systemName: "checkmark")
+                                .font(.caption.weight(.bold))
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .navigationTitle("Preset")
     }
 
     @ViewBuilder

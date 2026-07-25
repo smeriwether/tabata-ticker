@@ -4,6 +4,7 @@ import WatchConnectivity
 @MainActor
 final class WatchConnectivity: NSObject, WCSessionDelegate {
     var onState: ((TabataState) -> Void)?
+    var onCatalog: ((TabataPresetCatalog) -> Void)?
 
     func activate() {
         guard WCSession.isSupported() else {
@@ -13,10 +14,7 @@ final class WatchConnectivity: NSObject, WCSessionDelegate {
         let session = WCSession.default
         session.delegate = self
         session.activate()
-
-        if let state = TabataState.fromPayloadDictionary(session.receivedApplicationContext) {
-            onState?(state)
-        }
+        deliver(session.receivedApplicationContext)
     }
 
     func send(_ command: WatchCommandPayload) {
@@ -50,13 +48,33 @@ final class WatchConnectivity: NSObject, WCSessionDelegate {
         receive(message)
     }
 
+    // Decoded before hopping to the main actor, because the payload dictionary itself is not Sendable.
     private nonisolated func receive(_ dictionary: [String: Any]) {
         guard let state = TabataState.fromPayloadDictionary(dictionary) else {
             return
         }
 
+        let catalog = TabataState.catalogFromPayloadDictionary(dictionary)
+
         Task { @MainActor in
-            onState?(state)
+            apply(state: state, catalog: catalog)
+        }
+    }
+
+    private func deliver(_ dictionary: [String: Any]) {
+        guard let state = TabataState.fromPayloadDictionary(dictionary) else {
+            return
+        }
+
+        apply(state: state, catalog: TabataState.catalogFromPayloadDictionary(dictionary))
+    }
+
+    // A phone that predates preset syncing sends the state on its own, so the catalog is optional.
+    private func apply(state: TabataState, catalog: TabataPresetCatalog?) {
+        onState?(state)
+
+        if let catalog {
+            onCatalog?(catalog)
         }
     }
 }
