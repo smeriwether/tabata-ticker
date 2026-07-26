@@ -12,6 +12,11 @@ BETA_BUNDLE_ID = "#{BUNDLE_ID}.beta"
 BETA_WATCH_BUNDLE_ID = "#{BETA_BUNDLE_ID}.watchkitapp"
 BETA_LIVE_ACTIVITY_BUNDLE_ID = "#{BETA_BUNDLE_ID}.liveactivity"
 
+# The resolved package versions live inside the project bundle, so they are carried across the
+# regeneration below. Losing them would let a release build drift onto a different SDK version.
+RESOLVED_PATH = File.join(PROJECT_PATH, "project.xcworkspace", "xcshareddata", "swiftpm", "Package.resolved")
+resolved_packages = File.exist?(RESOLVED_PATH) ? File.read(RESOLVED_PATH) : nil
+
 FileUtils.rm_rf(PROJECT_PATH)
 
 project = Xcodeproj::Project.new(PROJECT_PATH)
@@ -207,6 +212,11 @@ test_target.build_configurations.each do |config|
 end
 
 project.save
+
+if resolved_packages
+  FileUtils.mkdir_p(File.dirname(RESOLVED_PATH))
+  File.write(RESOLVED_PATH, resolved_packages)
+end
 
 ios_scheme = Xcodeproj::XCScheme.new
 ios_scheme.add_build_target(ios_target)
