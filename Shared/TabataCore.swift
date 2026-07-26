@@ -137,6 +137,48 @@ struct TabataPresetCatalog: Equatable, Sendable {
     }
 }
 
+struct TabataSettings: Codable, Equatable, Sendable {
+    var soundsEnabled: Bool
+    var hapticsEnabled: Bool
+    var startCountdownEnabled: Bool
+
+    static let standard = TabataSettings(soundsEnabled: true, hapticsEnabled: true, startCountdownEnabled: true)
+}
+
+struct TabataSettingsStore {
+    private static let soundsEnabledKey = "soundsEnabled"
+    private static let hapticsEnabledKey = "hapticsEnabled"
+    private static let startCountdownEnabledKey = "startCountdownEnabled"
+
+    private let defaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    func load() -> TabataSettings {
+        var settings = TabataSettings.standard
+
+        if defaults.object(forKey: Self.soundsEnabledKey) != nil {
+            settings.soundsEnabled = defaults.bool(forKey: Self.soundsEnabledKey)
+        }
+        if defaults.object(forKey: Self.hapticsEnabledKey) != nil {
+            settings.hapticsEnabled = defaults.bool(forKey: Self.hapticsEnabledKey)
+        }
+        if defaults.object(forKey: Self.startCountdownEnabledKey) != nil {
+            settings.startCountdownEnabled = defaults.bool(forKey: Self.startCountdownEnabledKey)
+        }
+
+        return settings
+    }
+
+    func save(_ settings: TabataSettings) {
+        defaults.set(settings.soundsEnabled, forKey: Self.soundsEnabledKey)
+        defaults.set(settings.hapticsEnabled, forKey: Self.hapticsEnabledKey)
+        defaults.set(settings.startCountdownEnabled, forKey: Self.startCountdownEnabledKey)
+    }
+}
+
 // Shared code is built for the watch and for tests as well as the iPhone app, so it reports failures
 // through this seam instead of depending on a crash reporter directly. The iPhone app points it at
 // Sentry during launch, before anything else can report, which is why the unchecked access is safe.
@@ -271,11 +313,9 @@ struct TabataState: Codable, Equatable, Sendable {
     var phaseDuration: TimeInterval
     var isRunning: Bool
     var pausedRemaining: TimeInterval?
-    var soundsEnabled: Bool
-    var hapticsEnabled: Bool
-    var startCountdownEnabled: Bool
+    var settings: TabataSettings
 
-    static func idle(config: TabataConfig = .classic) -> TabataState {
+    static func idle(config: TabataConfig = .classic, settings: TabataSettings = .standard) -> TabataState {
         TabataState(
             config: config,
             phase: .idle,
@@ -284,9 +324,7 @@ struct TabataState: Codable, Equatable, Sendable {
             phaseDuration: config.workDuration,
             isRunning: false,
             pausedRemaining: config.workDuration,
-            soundsEnabled: true,
-            hapticsEnabled: true,
-            startCountdownEnabled: true
+            settings: settings
         )
     }
 
@@ -322,6 +360,8 @@ extension TabataState {
         case startCountdownEnabled
     }
 
+    // Settings are grouped in memory but stay flat on the wire, so a watch build that predates the
+    // grouping still decodes a payload from a phone that has it.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -332,9 +372,26 @@ extension TabataState {
         phaseDuration = try container.decode(TimeInterval.self, forKey: .phaseDuration)
         isRunning = try container.decode(Bool.self, forKey: .isRunning)
         pausedRemaining = try container.decodeIfPresent(TimeInterval.self, forKey: .pausedRemaining)
-        soundsEnabled = try container.decode(Bool.self, forKey: .soundsEnabled)
-        hapticsEnabled = try container.decode(Bool.self, forKey: .hapticsEnabled)
-        startCountdownEnabled = try container.decodeIfPresent(Bool.self, forKey: .startCountdownEnabled) ?? true
+        settings = TabataSettings(
+            soundsEnabled: try container.decode(Bool.self, forKey: .soundsEnabled),
+            hapticsEnabled: try container.decode(Bool.self, forKey: .hapticsEnabled),
+            startCountdownEnabled: try container.decodeIfPresent(Bool.self, forKey: .startCountdownEnabled) ?? true
+        )
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(config, forKey: .config)
+        try container.encode(phase, forKey: .phase)
+        try container.encode(round, forKey: .round)
+        try container.encodeIfPresent(phaseStartedAt, forKey: .phaseStartedAt)
+        try container.encode(phaseDuration, forKey: .phaseDuration)
+        try container.encode(isRunning, forKey: .isRunning)
+        try container.encodeIfPresent(pausedRemaining, forKey: .pausedRemaining)
+        try container.encode(settings.soundsEnabled, forKey: .soundsEnabled)
+        try container.encode(settings.hapticsEnabled, forKey: .hapticsEnabled)
+        try container.encode(settings.startCountdownEnabled, forKey: .startCountdownEnabled)
     }
 }
 
@@ -464,7 +521,7 @@ struct TabataEngine {
             return
         }
 
-        if state.startCountdownEnabled {
+        if state.settings.startCountdownEnabled {
             startCountdown(now: now)
             return
         }
@@ -472,40 +529,23 @@ struct TabataEngine {
         startWork(now: now)
     }
 
+    // Phases are entered by moving the state forward rather than rebuilding it, so the config and
+    // the settings carry across on their own.
     private mutating func startCountdown(now: Date) {
-        let soundsEnabled = state.soundsEnabled
-        let hapticsEnabled = state.hapticsEnabled
-        let startCountdownEnabled = state.startCountdownEnabled
-        state = TabataState(
-            config: state.config,
-            phase: .countdown,
-            round: 0,
-            phaseStartedAt: now,
-            phaseDuration: TabataState.startCountdownDuration,
-            isRunning: true,
-            pausedRemaining: nil,
-            soundsEnabled: soundsEnabled,
-            hapticsEnabled: hapticsEnabled,
-            startCountdownEnabled: startCountdownEnabled
-        )
+        enterPhase(.countdown, round: 0, duration: TabataState.startCountdownDuration, now: now)
     }
 
     private mutating func startWork(now: Date) {
-        let soundsEnabled = state.soundsEnabled
-        let hapticsEnabled = state.hapticsEnabled
-        let startCountdownEnabled = state.startCountdownEnabled
-        state = TabataState(
-            config: state.config,
-            phase: .work,
-            round: 1,
-            phaseStartedAt: now,
-            phaseDuration: state.config.workDuration,
-            isRunning: true,
-            pausedRemaining: nil,
-            soundsEnabled: soundsEnabled,
-            hapticsEnabled: hapticsEnabled,
-            startCountdownEnabled: startCountdownEnabled
-        )
+        enterPhase(.work, round: 1, duration: state.config.workDuration, now: now)
+    }
+
+    private mutating func enterPhase(_ phase: TabataPhase, round: Int, duration: TimeInterval, now: Date) {
+        state.phase = phase
+        state.round = round
+        state.phaseStartedAt = now
+        state.phaseDuration = duration
+        state.isRunning = true
+        state.pausedRemaining = nil
     }
 
     mutating func pause(now: Date) {
@@ -539,25 +579,11 @@ struct TabataEngine {
     }
 
     mutating func reset() {
-        let soundsEnabled = state.soundsEnabled
-        let hapticsEnabled = state.hapticsEnabled
-        let startCountdownEnabled = state.startCountdownEnabled
-        state = .idle(config: state.config)
-        state.soundsEnabled = soundsEnabled
-        state.hapticsEnabled = hapticsEnabled
-        state.startCountdownEnabled = startCountdownEnabled
+        state = .idle(config: state.config, settings: state.settings)
     }
 
-    mutating func setSoundsEnabled(_ enabled: Bool) {
-        state.soundsEnabled = enabled
-    }
-
-    mutating func setHapticsEnabled(_ enabled: Bool) {
-        state.hapticsEnabled = enabled
-    }
-
-    mutating func setStartCountdownEnabled(_ enabled: Bool) {
-        state.startCountdownEnabled = enabled
+    mutating func updateSettings(_ change: (inout TabataSettings) -> Void) {
+        change(&state.settings)
     }
 
     mutating func tick(now: Date) -> TabataState {
@@ -624,7 +650,7 @@ struct CountdownCue: Hashable, Sendable {
 
 enum TabataCuePolicy {
     static func countdownCue(in state: TabataState, now: Date) -> CountdownCue? {
-        guard (state.soundsEnabled || state.hapticsEnabled), state.isRunning, state.phase == .countdown || state.isWorkoutPhase else {
+        guard (state.settings.soundsEnabled || state.settings.hapticsEnabled), state.isRunning, state.phase == .countdown || state.isWorkoutPhase else {
             return nil
         }
 
@@ -647,7 +673,7 @@ enum TabataCuePolicy {
     }
 
     static func needsTransitionCue(from oldState: TabataState, to newState: TabataState) -> Bool {
-        guard newState.soundsEnabled || newState.hapticsEnabled else {
+        guard newState.settings.soundsEnabled || newState.settings.hapticsEnabled else {
             return false
         }
 

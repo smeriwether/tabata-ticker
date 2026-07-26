@@ -32,7 +32,7 @@ final class TabataCoreTests: XCTestCase {
         let now = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()
 
-        engine.setStartCountdownEnabled(false)
+        engine.updateSettings { $0.startCountdownEnabled = false }
         engine.start(now: now)
 
         XCTAssertEqual(engine.state.phase, .work)
@@ -108,7 +108,7 @@ final class TabataCoreTests: XCTestCase {
     func testToggleRunningStartsPausesResumesAndRestartsCompleteWorkout() {
         let start = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()
-        engine.setStartCountdownEnabled(false)
+        engine.updateSettings { $0.startCountdownEnabled = false }
 
         engine.toggleRunning(now: start)
 
@@ -181,8 +181,8 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertTrue(TabataCuePolicy.needsTransitionCue(from: workState, to: restState))
 
         var mutedRestState = restState
-        mutedRestState.soundsEnabled = false
-        mutedRestState.hapticsEnabled = false
+        mutedRestState.settings.soundsEnabled = false
+        mutedRestState.settings.hapticsEnabled = false
 
         XCTAssertFalse(TabataCuePolicy.needsTransitionCue(from: workState, to: mutedRestState))
     }
@@ -192,8 +192,8 @@ final class TabataCoreTests: XCTestCase {
         var engine = TabataEngine()
 
         startWorkout(&engine, now: start)
-        engine.setSoundsEnabled(false)
-        engine.setHapticsEnabled(false)
+        engine.updateSettings { $0.soundsEnabled = false }
+        engine.updateSettings { $0.hapticsEnabled = false }
 
         XCTAssertNil(TabataCuePolicy.countdownCue(in: engine.state, now: start.addingTimeInterval(15)))
         XCTAssertFalse(TabataCuePolicy.needsTransitionCue(from: engine.state, to: engine.tick(now: start.addingTimeInterval(20))))
@@ -204,7 +204,7 @@ final class TabataCoreTests: XCTestCase {
         var engine = TabataEngine()
 
         startWorkout(&engine, now: start)
-        engine.setSoundsEnabled(false)
+        engine.updateSettings { $0.soundsEnabled = false }
 
         XCTAssertEqual(TabataCuePolicy.countdownCue(in: engine.state, now: start.addingTimeInterval(15))?.second, 5)
     }
@@ -213,15 +213,15 @@ final class TabataCoreTests: XCTestCase {
         let start = Date(timeIntervalSince1970: 100)
         var engine = TabataEngine()
 
-        engine.setSoundsEnabled(false)
-        engine.setHapticsEnabled(false)
-        engine.setStartCountdownEnabled(false)
+        engine.updateSettings { $0.soundsEnabled = false }
+        engine.updateSettings { $0.hapticsEnabled = false }
+        engine.updateSettings { $0.startCountdownEnabled = false }
         startWorkout(&engine, now: start)
         engine.reset()
 
-        XCTAssertFalse(engine.state.soundsEnabled)
-        XCTAssertFalse(engine.state.hapticsEnabled)
-        XCTAssertFalse(engine.state.startCountdownEnabled)
+        XCTAssertFalse(engine.state.settings.soundsEnabled)
+        XCTAssertFalse(engine.state.settings.hapticsEnabled)
+        XCTAssertFalse(engine.state.settings.startCountdownEnabled)
         XCTAssertEqual(engine.state.phase, .idle)
     }
 
@@ -328,7 +328,19 @@ final class TabataCoreTests: XCTestCase {
 
         let decoded = TabataState.fromPayloadDictionary(dictionary)
 
-        XCTAssertEqual(decoded?.startCountdownEnabled, true)
+        XCTAssertEqual(decoded?.settings.startCountdownEnabled, true)
+    }
+
+    func testSettingsStayFlatInThePayloadForOlderWatchBuilds() {
+        var state = TabataState.idle()
+        state.settings.soundsEnabled = false
+        let payload = state.payloadDictionary()
+
+        XCTAssertEqual(payload["soundsEnabled"] as? Bool, false)
+        XCTAssertEqual(payload["hapticsEnabled"] as? Bool, true)
+        XCTAssertEqual(payload["startCountdownEnabled"] as? Bool, true)
+        XCTAssertNil(payload["settings"])
+        XCTAssertEqual(TabataState.fromPayloadDictionary(payload), state)
     }
 
     func testStatePayloadCarriesPresetCatalogToTheWatch() {
@@ -396,7 +408,7 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertEqual(countdown.primaryAction, .reset)
 
         engine.reset()
-        engine.setStartCountdownEnabled(false)
+        engine.updateSettings { $0.startCountdownEnabled = false }
 
         startWorkout(&engine, now: start)
         let work = TabataPresentation(state: engine.state)
@@ -433,7 +445,7 @@ final class TabataCoreTests: XCTestCase {
     }
 
     private func startWorkout(_ engine: inout TabataEngine, now: Date) {
-        engine.setStartCountdownEnabled(false)
+        engine.updateSettings { $0.startCountdownEnabled = false }
         engine.start(now: now)
     }
 }

@@ -10,13 +10,9 @@ final class WatchWorkoutViewModel {
     private(set) var now: Date
     private(set) var catalog = TabataPresetCatalog()
 
-    private static let soundsEnabledKey = "soundsEnabled"
-    private static let hapticsEnabledKey = "hapticsEnabled"
-    private static let startCountdownEnabledKey = "startCountdownEnabled"
-
     @ObservationIgnored
     private var engine: TabataEngine
-    private let defaults: UserDefaults
+    private let settingsStore: TabataSettingsStore
     private let connectivity = WatchConnectivity()
     private let cuePerformer = WatchCuePerformer()
     private let runtimeSessionController = WatchRuntimeSessionController()
@@ -28,19 +24,10 @@ final class WatchWorkoutViewModel {
     private var tickTask: Task<Void, Never>?
 
     init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
+        let settingsStore = TabataSettingsStore(defaults: defaults)
+        self.settingsStore = settingsStore
 
-        var initialState = TabataState.idle()
-        if defaults.object(forKey: Self.soundsEnabledKey) != nil {
-            initialState.soundsEnabled = defaults.bool(forKey: Self.soundsEnabledKey)
-        }
-        if defaults.object(forKey: Self.hapticsEnabledKey) != nil {
-            initialState.hapticsEnabled = defaults.bool(forKey: Self.hapticsEnabledKey)
-        }
-        if defaults.object(forKey: Self.startCountdownEnabledKey) != nil {
-            initialState.startCountdownEnabled = defaults.bool(forKey: Self.startCountdownEnabledKey)
-        }
-
+        let initialState = TabataState.idle(settings: settingsStore.load())
         state = initialState
         now = Date()
         engine = TabataEngine(state: initialState)
@@ -89,12 +76,12 @@ final class WatchWorkoutViewModel {
         state = engine.tick(now: now)
 
         if TabataCuePolicy.needsTransitionCue(from: oldState, to: state) {
-            cuePerformer.playTransition(soundsEnabled: state.soundsEnabled, hapticsEnabled: state.hapticsEnabled)
+            cuePerformer.playTransition(soundsEnabled: state.settings.soundsEnabled, hapticsEnabled: state.settings.hapticsEnabled)
             lastCountdownCue = nil
         }
 
         if let cue = TabataCuePolicy.countdownCue(in: state, now: now), cue != lastCountdownCue {
-            cuePerformer.playCountdown(soundsEnabled: state.soundsEnabled, hapticsEnabled: state.hapticsEnabled)
+            cuePerformer.playCountdown(soundsEnabled: state.settings.soundsEnabled, hapticsEnabled: state.settings.hapticsEnabled)
             lastCountdownCue = cue
         }
 
@@ -122,9 +109,9 @@ final class WatchWorkoutViewModel {
 
     func setSoundsEnabled(_ enabled: Bool) {
         now = Date()
-        defaults.set(enabled, forKey: Self.soundsEnabledKey)
-        state.soundsEnabled = enabled
-        engine = TabataEngine(state: state)
+        engine.updateSettings { $0.soundsEnabled = enabled }
+        state = engine.state
+        settingsStore.save(state.settings)
         lastCountdownCue = nil
         syncRunningState()
         connectivity.send(WatchCommandPayload(command: .setSoundsEnabled, soundsEnabled: enabled))
@@ -132,9 +119,7 @@ final class WatchWorkoutViewModel {
 
     private func receive(_ newState: TabataState) {
         now = Date()
-        defaults.set(newState.soundsEnabled, forKey: Self.soundsEnabledKey)
-        defaults.set(newState.hapticsEnabled, forKey: Self.hapticsEnabledKey)
-        defaults.set(newState.startCountdownEnabled, forKey: Self.startCountdownEnabledKey)
+        settingsStore.save(newState.settings)
         state = newState
         engine = TabataEngine(state: newState)
         lastCountdownCue = nil

@@ -10,15 +10,11 @@ final class WorkoutViewModel {
     private(set) var now: Date
     private(set) var presetCatalog: TabataPresetCatalog
 
-    private static let soundsEnabledKey = "soundsEnabled"
-    private static let hapticsEnabledKey = "hapticsEnabled"
-    private static let startCountdownEnabledKey = "startCountdownEnabled"
-
     @ObservationIgnored
     private var engine: TabataEngine
-    private let defaults: UserDefaults
     private let presetStore: TabataPresetStore
     private let stateStore: TabataStateStore
+    private let settingsStore: TabataSettingsStore
     private let connectivity = PhoneConnectivity()
     private let cuePerformer = PhoneCuePerformer()
     private let liveActivityController = TabataLiveActivityController()
@@ -45,32 +41,19 @@ final class WorkoutViewModel {
     }
 
     init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
         let presetStore = TabataPresetStore(defaults: defaults)
         self.presetStore = presetStore
         let stateStore = TabataStateStore(defaults: defaults)
         self.stateStore = stateStore
+        let settingsStore = TabataSettingsStore(defaults: defaults)
+        self.settingsStore = settingsStore
         let presetCatalog = presetStore.loadCatalog()
         self.presetCatalog = presetCatalog
 
-        var initialState = TabataState.idle(config: presetCatalog.selectedPreset.config)
-        if defaults.object(forKey: Self.soundsEnabledKey) != nil {
-            initialState.soundsEnabled = defaults.bool(forKey: Self.soundsEnabledKey)
-        }
-        if defaults.object(forKey: Self.hapticsEnabledKey) != nil {
-            initialState.hapticsEnabled = defaults.bool(forKey: Self.hapticsEnabledKey)
-        }
-        if defaults.object(forKey: Self.startCountdownEnabledKey) != nil {
-            initialState.startCountdownEnabled = defaults.bool(forKey: Self.startCountdownEnabledKey)
-        }
-
+        let settings = settingsStore.load()
         let now = Date()
-        if var restored = stateStore.restore(now: now) {
-            restored.soundsEnabled = initialState.soundsEnabled
-            restored.hapticsEnabled = initialState.hapticsEnabled
-            restored.startCountdownEnabled = initialState.startCountdownEnabled
-            initialState = restored
-        }
+        var initialState = stateStore.restore(now: now) ?? .idle(config: presetCatalog.selectedPreset.config)
+        initialState.settings = settings
 
         state = initialState
         self.now = now
@@ -112,12 +95,12 @@ final class WorkoutViewModel {
         self.now = now
         state = engine.tick(now: now)
 
-        if state.soundsEnabled, TabataCuePolicy.needsTransitionCue(from: oldState, to: state) {
+        if state.settings.soundsEnabled, TabataCuePolicy.needsTransitionCue(from: oldState, to: state) {
             cuePerformer.playTransition()
             lastCountdownCue = nil
         }
 
-        if state.soundsEnabled, let cue = TabataCuePolicy.countdownCue(in: state, now: now), cue != lastCountdownCue {
+        if state.settings.soundsEnabled, let cue = TabataCuePolicy.countdownCue(in: state, now: now), cue != lastCountdownCue {
             cuePerformer.playCountdown()
             lastCountdownCue = cue
         }
@@ -139,28 +122,11 @@ final class WorkoutViewModel {
     }
 
     func reset() {
-        now = Date()
-        let soundsEnabled = state.soundsEnabled
-        let hapticsEnabled = state.hapticsEnabled
-        let startCountdownEnabled = state.startCountdownEnabled
-        var resetState = TabataState.idle(config: selectedPreset.config)
-        resetState.soundsEnabled = soundsEnabled
-        resetState.hapticsEnabled = hapticsEnabled
-        resetState.startCountdownEnabled = startCountdownEnabled
-        engine = TabataEngine(state: resetState)
-        state = engine.state
-        lastCountdownCue = nil
-        syncRunningState()
-        publishState()
+        resetToSelectedPreset()
     }
 
     func setSoundsEnabled(_ enabled: Bool) {
-        now = Date()
-        defaults.set(enabled, forKey: Self.soundsEnabledKey)
-        engine.setSoundsEnabled(enabled)
-        state = engine.state
-        lastCountdownCue = nil
-        publishState()
+        updateSettings { $0.soundsEnabled = enabled }
     }
 
     func selectPreset(id: String) {
@@ -220,19 +186,18 @@ final class WorkoutViewModel {
     }
 
     func setHapticsEnabled(_ enabled: Bool) {
-        now = Date()
-        defaults.set(enabled, forKey: Self.hapticsEnabledKey)
-        engine.setHapticsEnabled(enabled)
-        state = engine.state
-        lastCountdownCue = nil
-        publishState()
+        updateSettings { $0.hapticsEnabled = enabled }
     }
 
     func setStartCountdownEnabled(_ enabled: Bool) {
+        updateSettings { $0.startCountdownEnabled = enabled }
+    }
+
+    private func updateSettings(_ change: (inout TabataSettings) -> Void) {
         now = Date()
-        defaults.set(enabled, forKey: Self.startCountdownEnabledKey)
-        engine.setStartCountdownEnabled(enabled)
+        engine.updateSettings(change)
         state = engine.state
+        settingsStore.save(state.settings)
         lastCountdownCue = nil
         publishState()
     }
@@ -248,7 +213,7 @@ final class WorkoutViewModel {
         case .reset:
             reset()
         case .setSoundsEnabled:
-            setSoundsEnabled(payload.soundsEnabled ?? state.soundsEnabled)
+            setSoundsEnabled(payload.soundsEnabled ?? state.settings.soundsEnabled)
         case .selectPreset:
             guard let presetID = payload.presetID else {
                 return
@@ -265,15 +230,9 @@ final class WorkoutViewModel {
     }
 
     private func resetToSelectedPreset() {
-        let soundsEnabled = state.soundsEnabled
-        let hapticsEnabled = state.hapticsEnabled
-        let startCountdownEnabled = state.startCountdownEnabled
         now = Date()
 
-        var selectedState = TabataState.idle(config: selectedPreset.config)
-        selectedState.soundsEnabled = soundsEnabled
-        selectedState.hapticsEnabled = hapticsEnabled
-        selectedState.startCountdownEnabled = startCountdownEnabled
+        let selectedState = TabataState.idle(config: selectedPreset.config, settings: state.settings)
         engine = TabataEngine(state: selectedState)
         state = selectedState
         lastCountdownCue = nil

@@ -97,15 +97,15 @@ struct ContentView: View {
 
             SettingsView(
                 soundsEnabled: Binding(
-                    get: { viewModel.state.soundsEnabled },
+                    get: { viewModel.state.settings.soundsEnabled },
                     set: { viewModel.setSoundsEnabled($0) }
                 ),
                 hapticsEnabled: Binding(
-                    get: { viewModel.state.hapticsEnabled },
+                    get: { viewModel.state.settings.hapticsEnabled },
                     set: { viewModel.setHapticsEnabled($0) }
                 ),
                 startCountdownEnabled: Binding(
-                    get: { viewModel.state.startCountdownEnabled },
+                    get: { viewModel.state.settings.startCountdownEnabled },
                     set: { viewModel.setStartCountdownEnabled($0) }
                 ),
                 presets: viewModel.presets,
