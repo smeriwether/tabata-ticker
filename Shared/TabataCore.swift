@@ -57,13 +57,40 @@ struct TabataConfig: Codable, Equatable, Sendable {
 struct TabataPreset: Codable, Equatable, Identifiable, Sendable {
     static let defaultID = "classic"
     static let classic = TabataPreset(id: defaultID, config: .classic, isDefault: true)
+    static let maxNameLength = 24
 
     var id: String
     var config: TabataConfig
     var isDefault: Bool
+    var customName: String?
 
+    init(id: String, config: TabataConfig, isDefault: Bool, customName: String? = nil) {
+        self.id = id
+        self.config = config
+        self.isDefault = isDefault
+        self.customName = Self.sanitizedName(customName)
+    }
+
+    // Unnamed presets keep showing the work/rest/rounds shorthand, which is what every preset showed
+    // before naming existed.
     var name: String {
+        customName ?? config.presetName
+    }
+
+    var timingText: String {
         config.presetName
+    }
+
+    var hasCustomName: Bool {
+        customName != nil
+    }
+
+    static func sanitizedName(_ name: String?) -> String? {
+        guard let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else {
+            return nil
+        }
+
+        return String(trimmed.prefix(maxNameLength))
     }
 }
 
@@ -106,24 +133,25 @@ struct TabataPresetCatalog: Equatable, Sendable {
         return true
     }
 
-    mutating func addUserPreset(config: TabataConfig, id: String = UUID().uuidString) -> TabataPreset? {
+    mutating func addUserPreset(config: TabataConfig, name: String? = nil, id: String = UUID().uuidString) -> TabataPreset? {
         guard canCreatePreset else {
             return nil
         }
 
-        let preset = TabataPreset(id: id, config: config.clamped, isDefault: false)
+        let preset = TabataPreset(id: id, config: config.clamped, isDefault: false, customName: name)
         presets.append(preset)
         selectedID = preset.id
         return preset
     }
 
     @discardableResult
-    mutating func updateUserPreset(id: String, config: TabataConfig) -> Bool {
+    mutating func updateUserPreset(id: String, config: TabataConfig, name: String? = nil) -> Bool {
         guard let index = presets.firstIndex(where: { $0.id == id && !$0.isDefault }) else {
             return false
         }
 
         presets[index].config = config.clamped
+        presets[index].customName = TabataPreset.sanitizedName(name)
         return true
     }
 
@@ -148,7 +176,14 @@ struct TabataPresetCatalog: Equatable, Sendable {
                 continue
             }
 
-            cleaned.append(TabataPreset(id: preset.id, config: preset.config.clamped, isDefault: false))
+            cleaned.append(
+                TabataPreset(
+                    id: preset.id,
+                    config: preset.config.clamped,
+                    isDefault: false,
+                    customName: preset.customName
+                )
+            )
         }
 
         return cleaned

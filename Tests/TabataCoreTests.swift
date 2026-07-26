@@ -243,6 +243,42 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertEqual(catalog.selectedPreset, custom)
     }
 
+    func testPresetNameFallsBackToItsTimings() {
+        var catalog = TabataPresetCatalog()
+        catalog.addUserPreset(config: TabataConfig.preset(workSeconds: 45, restSeconds: 15, rounds: 6), id: "custom")
+
+        XCTAssertEqual(catalog.selectedPreset.name, "45/15/6")
+        XCTAssertFalse(catalog.selectedPreset.hasCustomName)
+
+        catalog.updateUserPreset(id: "custom", config: catalog.selectedPreset.config, name: "  Sprints  ")
+
+        XCTAssertEqual(catalog.selectedPreset.name, "Sprints")
+        XCTAssertEqual(catalog.selectedPreset.timingText, "45/15/6")
+        XCTAssertTrue(catalog.selectedPreset.hasCustomName)
+    }
+
+    func testBlankNamesAreDroppedAndLongOnesAreCapped() {
+        var catalog = TabataPresetCatalog()
+        catalog.addUserPreset(config: .classic, name: "   ", id: "blank")
+
+        XCTAssertFalse(catalog.selectedPreset.hasCustomName)
+
+        catalog.updateUserPreset(id: "blank", config: .classic, name: String(repeating: "a", count: 100))
+
+        XCTAssertEqual(catalog.selectedPreset.name.count, TabataPreset.maxNameLength)
+    }
+
+    func testPresetsSavedBeforeNamingStillDecode() {
+        let stored = """
+        {"id":"custom","config":{"rounds":6,"workDuration":45,"restDuration":15},"isDefault":false}
+        """
+
+        let decoded = try? JSONDecoder().decode(TabataPreset.self, from: Data(stored.utf8))
+
+        XCTAssertEqual(decoded?.name, "45/15/6")
+        XCTAssertNil(decoded?.customName)
+    }
+
     func testStoredPresetsOutsideTheEditorRangesAreClamped() {
         let broken = TabataPreset(
             id: "broken",

@@ -11,26 +11,30 @@ struct PresetEditorView: View {
     let saveTitle: String
     let existingPresetID: String?
     let canCreatePreset: Bool
-    let onSave: (TabataConfig) -> Bool
+    let onSave: (TabataConfig, String?) -> Bool
 
+    @State private var name: String
     @State private var workSeconds: Int
     @State private var restSeconds: Int
     @State private var rounds: Int
     @State private var showsSaveError = false
+    @FocusState private var isNamingPreset: Bool
 
     init(
         title: String,
         saveTitle: String,
         initialConfig: TabataConfig,
+        initialName: String?,
         existingPresetID: String?,
         canCreatePreset: Bool,
-        onSave: @escaping (TabataConfig) -> Bool
+        onSave: @escaping (TabataConfig, String?) -> Bool
     ) {
         self.title = title
         self.saveTitle = saveTitle
         self.existingPresetID = existingPresetID
         self.canCreatePreset = canCreatePreset
         self.onSave = onSave
+        _name = State(initialValue: initialName ?? "")
         _workSeconds = State(initialValue: Self.clamped(initialConfig.workSeconds, to: Self.workRange))
         _restSeconds = State(initialValue: Self.clamped(initialConfig.restSeconds, to: Self.restRange))
         _rounds = State(initialValue: Self.clamped(initialConfig.rounds, to: Self.roundsRange))
@@ -38,13 +42,29 @@ struct PresetEditorView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
                 Text(title)
                     .font(.system(.largeTitle, design: .rounded).weight(.black))
 
+                // Empty means the preset keeps showing its timings, so the field is optional rather
+                // than something to fill in before saving.
+                TextField("Name (optional)", text: $name)
+                    .font(.system(.title, design: .rounded).weight(.black))
+                    .textInputAutocapitalization(.words)
+                    .submitLabel(.done)
+                    .focused($isNamingPreset)
+                    .onSubmit {
+                        isNamingPreset = false
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .accessibilityLabel("Preset name")
+
                 Text(config.presetName)
-                    .font(.system(.largeTitle, design: .rounded).weight(.black))
+                    .font(.headline.weight(.semibold))
                     .monospacedDigit()
+                    .foregroundStyle(.white.opacity(0.7))
             }
             .foregroundStyle(.white)
 
@@ -96,7 +116,7 @@ struct PresetEditorView: View {
             }
 
             Button {
-                showsSaveError = !onSave(config)
+                showsSaveError = !onSave(config, TabataPreset.sanitizedName(name))
             } label: {
                 Text(saveTitle)
                     .frame(maxWidth: .infinity, minHeight: 54)

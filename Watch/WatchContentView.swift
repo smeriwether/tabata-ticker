@@ -86,9 +86,18 @@ struct WatchContentView: View {
                     isChoosingPreset = false
                 } label: {
                     HStack {
-                        Text(preset.name)
-                            .font(.body.weight(.semibold))
-                            .monospacedDigit()
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(preset.name)
+                                .font(.body.weight(.semibold))
+                                .monospacedDigit()
+
+                            if preset.hasCustomName {
+                                Text(preset.timingText)
+                                    .font(.caption2)
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
 
                         Spacer(minLength: 8)
 

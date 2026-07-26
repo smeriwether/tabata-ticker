@@ -183,10 +183,9 @@ private struct PresetSettingsRow: View {
         .foregroundStyle(.white)
     }
 
+    // A named preset shows its timings underneath, since the name alone no longer says what it runs.
     private var statusText: String {
-        if preset.isDefault {
-            return "Default"
-        }
-        return "Custom"
+        let kind = preset.isDefault ? "Default" : "Custom"
+        return preset.hasCustomName ? "\(preset.timingText) · \(kind)" : kind
     }
 }

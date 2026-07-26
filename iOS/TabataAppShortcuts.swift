@@ -2,25 +2,75 @@ import AppIntents
 
 // Siri and Shortcuts run these in the app process, launching it in the background when needed, so a
 // workout can be started without unlocking the phone or leaving the exercise.
+// Presets are exposed as entities so a shortcut or a spoken phrase can name one; leaving the
+// parameter empty starts whichever preset is selected in the app.
+struct TabataPresetEntity: AppEntity {
+    static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Preset")
+    static let defaultQuery = TabataPresetQuery()
+
+    var id: String
+    var name: String
+    var timingText: String
+
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(title: "\(name)", subtitle: "\(timingText)")
+    }
+}
+
+struct TabataPresetQuery: EntityStringQuery {
+    func entities(for identifiers: [String]) async throws -> [TabataPresetEntity] {
+        allPresets().filter { identifiers.contains($0.id) }
+    }
+
+    func entities(matching string: String) async throws -> [TabataPresetEntity] {
+        allPresets().filter { $0.name.localizedCaseInsensitiveContains(string) }
+    }
+
+    func suggestedEntities() async throws -> [TabataPresetEntity] {
+        allPresets()
+    }
+
+    private func allPresets() -> [TabataPresetEntity] {
+        TabataPresetStore().loadCatalog().presets.map { preset in
+            TabataPresetEntity(id: preset.id, name: preset.name, timingText: preset.timingText)
+        }
+    }
+}
+
 struct StartWorkoutIntent: AppIntent {
     static let title: LocalizedStringResource = "Start Workout"
-    static let description = IntentDescription("Starts a workout using the selected preset.")
+    static let description = IntentDescription("Starts a workout, using the selected preset unless another is named.")
     static let openAppWhenRun = false
 
+    @Parameter(title: "Preset")
+    var preset: TabataPresetEntity?
+
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        let didStart = await MainActor.run { () -> Bool in
+        let presetID = preset?.id
+
+        let startedName = await MainActor.run { () -> String? in
             let workout = WorkoutViewModel.shared()
             workout.activate()
 
             guard workout.state.phase == .idle || workout.state.phase == .complete else {
-                return false
+                return nil
+            }
+
+            if let presetID {
+                // A finished workout has to return to idle before the catalog will switch presets.
+                workout.reset()
+                workout.selectPreset(id: presetID)
             }
 
             workout.start()
-            return true
+            return workout.selectedPreset.name
         }
 
-        return .result(dialog: didStart ? "Starting your workout." : "A workout is already running.")
+        guard let startedName else {
+            return .result(dialog: "A workout is already running.")
+        }
+
+        return .result(dialog: "Starting \(startedName).")
     }
 }
 
@@ -75,7 +125,9 @@ struct TabataShortcuts: AppShortcutsProvider {
             phrases: [
                 "Start a workout with \(.applicationName)",
                 "Start a Tabata with \(.applicationName)",
-                "Start \(.applicationName)"
+                "Start \(.applicationName)",
+                "Start my \(\.$preset) workout with \(.applicationName)",
+                "Start \(\.$preset) with \(.applicationName)"
             ],
             shortTitle: "Start Workout",
             systemImageName: "play.fill"

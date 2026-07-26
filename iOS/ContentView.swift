@@ -135,17 +135,18 @@ struct ContentView: View {
                 title: route.title,
                 saveTitle: route.saveTitle,
                 initialConfig: initialConfig,
+                initialName: preset?.customName,
                 existingPresetID: preset?.id,
                 canCreatePreset: viewModel.canCreatePreset,
-                onSave: { config in
+                onSave: { config, name in
                     let didSave: Bool
                     switch route {
                     case .settings:
                         didSave = false
                     case .createPreset:
-                        didSave = viewModel.createPreset(config: config)
+                        didSave = viewModel.createPreset(config: config, name: name)
                     case .editPreset(let presetID):
-                        didSave = viewModel.updatePreset(id: presetID, config: config)
+                        didSave = viewModel.updatePreset(id: presetID, config: config, name: name)
                     }
 
                     if didSave {
