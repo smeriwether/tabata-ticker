@@ -15,12 +15,30 @@ struct TabataConfig: Codable, Equatable, Sendable {
 
     static let classic = TabataConfig(rounds: 8, workDuration: 20, restDuration: 10)
 
+    static let workSecondsRange = 5...300
+    static let restSecondsRange = 5...300
+    static let roundsRange = 1...30
+
     static func preset(workSeconds: Int, restSeconds: Int, rounds: Int) -> TabataConfig {
         TabataConfig(
             rounds: rounds,
             workDuration: TimeInterval(workSeconds),
             restDuration: TimeInterval(restSeconds)
         )
+    }
+
+    // Stored presets are only as trustworthy as the defaults they came from, and a zero-second phase
+    // would leave the engine spinning through rounds, so every config is pulled back into range.
+    var clamped: TabataConfig {
+        TabataConfig.preset(
+            workSeconds: Self.clamp(workSeconds, to: Self.workSecondsRange),
+            restSeconds: Self.clamp(restSeconds, to: Self.restSecondsRange),
+            rounds: Self.clamp(rounds, to: Self.roundsRange)
+        )
+    }
+
+    private static func clamp(_ value: Int, to range: ClosedRange<Int>) -> Int {
+        min(max(value, range.lowerBound), range.upperBound)
     }
 
     var workSeconds: Int {
@@ -93,7 +111,7 @@ struct TabataPresetCatalog: Equatable, Sendable {
             return nil
         }
 
-        let preset = TabataPreset(id: id, config: config, isDefault: false)
+        let preset = TabataPreset(id: id, config: config.clamped, isDefault: false)
         presets.append(preset)
         selectedID = preset.id
         return preset
@@ -105,7 +123,7 @@ struct TabataPresetCatalog: Equatable, Sendable {
             return false
         }
 
-        presets[index].config = config
+        presets[index].config = config.clamped
         return true
     }
 
@@ -130,7 +148,7 @@ struct TabataPresetCatalog: Equatable, Sendable {
                 continue
             }
 
-            cleaned.append(TabataPreset(id: preset.id, config: preset.config, isDefault: false))
+            cleaned.append(TabataPreset(id: preset.id, config: preset.config.clamped, isDefault: false))
         }
 
         return cleaned

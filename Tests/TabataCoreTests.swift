@@ -243,6 +243,31 @@ final class TabataCoreTests: XCTestCase {
         XCTAssertEqual(catalog.selectedPreset, custom)
     }
 
+    func testStoredPresetsOutsideTheEditorRangesAreClamped() {
+        let broken = TabataPreset(
+            id: "broken",
+            config: TabataConfig(rounds: 0, workDuration: 0, restDuration: 9_000),
+            isDefault: false
+        )
+        let catalog = TabataPresetCatalog(customPresets: [broken], selectedID: "broken")
+
+        XCTAssertEqual(catalog.selectedPreset.config.workSeconds, TabataConfig.workSecondsRange.lowerBound)
+        XCTAssertEqual(catalog.selectedPreset.config.restSeconds, TabataConfig.restSecondsRange.upperBound)
+        XCTAssertEqual(catalog.selectedPreset.config.rounds, TabataConfig.roundsRange.lowerBound)
+    }
+
+    func testCreatedAndEditedPresetsAreClamped() {
+        var catalog = TabataPresetCatalog()
+        catalog.addUserPreset(config: TabataConfig(rounds: 99, workDuration: 1, restDuration: 10), id: "custom")
+
+        XCTAssertEqual(catalog.selectedPreset.config.rounds, TabataConfig.roundsRange.upperBound)
+        XCTAssertEqual(catalog.selectedPreset.config.workSeconds, TabataConfig.workSecondsRange.lowerBound)
+
+        catalog.updateUserPreset(id: "custom", config: TabataConfig(rounds: 4, workDuration: 4_000, restDuration: 10))
+
+        XCTAssertEqual(catalog.selectedPreset.config.workSeconds, TabataConfig.workSecondsRange.upperBound)
+    }
+
     func testPresetCatalogProtectsDefaultPreset() {
         var catalog = TabataPresetCatalog()
 
